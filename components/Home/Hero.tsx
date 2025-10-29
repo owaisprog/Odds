@@ -32,7 +32,7 @@ export default function Hero() {
   return (
     <section className="w-full bg-white">
       {/* Featured Article Carousel */}
-      <div className="relative w-full h-96 md:h-screen  ">
+      <div className="relative w-full h-96 md:h-160  ">
         {/* Main Featured Article */}
         {featuredArticles.length > 0 && (
           <div className="relative w-full h-full">

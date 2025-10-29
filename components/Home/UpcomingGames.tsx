@@ -14,7 +14,7 @@ export default function UpcomingGames() {
 
   return (
     <section className="w-full bg-white py-16 sm:py-20 px-4 ">
-      <div className="max-w-[1100px] mx-auto">
+      <div className="container mx-auto">
         {/* Header */}
         <div className="mb-8 sm:mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>

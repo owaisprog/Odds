@@ -563,3 +563,139 @@ export const navLinks: NavLink[] = [
   { label: "Leagues", href: "/leagues" },
   { label: "Analysis", href: "/analysis" },
 ]
+
+
+//Articles
+
+// ---------- Blog articles (dummy data) ----------
+
+export type LeagueKey = "NFL" | "NBA" | "NCAAF" | "NCAAB" | "MLB" | "UFC";
+
+export type ArticleCategory = {
+  name: string;
+  slug: string;
+};
+
+export type BlogArticle = {
+  _id: string;
+  slug: string;
+  title: string;
+  description: string;
+  thumbnail: string; // e.g. /images/blog/nfl-undervalued.jpg
+  categories: ArticleCategory[];
+  league: LeagueKey;
+  publishedAt: string; // ISO date
+};
+
+export const blogArticles: BlogArticle[] = [
+  // NFL
+  {
+    _id: "a-nfl-1",
+    slug: "why-the-49ers-are-undervalued-this-week",
+    title: "Why the 49ers Are Undervalued This Week",
+    description:
+      "San Francisco could exploit a key matchup advantage on early downs. We break down the numbers and how to play it.",
+    thumbnail: "/images/blog/nfl-49ers.jpg",
+    categories: [{ name: "NFL", slug: "nfl" }, { name: "Analysis", slug: "analysis" }],
+    league: "NFL",
+    publishedAt: "2025-01-02T15:10:00.000Z",
+  },
+  {
+    _id: "a-nfl-2",
+    slug: "eagles-vs-cowboys-primer-odds-and-picks",
+    title: "Eagles vs Cowboys Primer: Odds & Picks",
+    description:
+      "Updated lines, matchup edges, and our favorite prop angles for the NFC clash.",
+    thumbnail: "/images/blog/nfl-eagles-cowboys.jpg",
+    categories: [{ name: "NFL", slug: "nfl" }, { name: "Picks", slug: "picks" }],
+    league: "NFL",
+    publishedAt: "2025-01-03T12:00:00.000Z",
+  },
+
+  // NBA
+  {
+    _id: "a-nba-1",
+    slug: "best-bets-for-lakers-vs-nuggets",
+    title: "Best Bets for Lakers vs Nuggets",
+    description:
+      "Our model favors Denver on the glass and pace. Here’s how that translates into value on the spread and total.",
+    thumbnail: "/images/blog/nba-lakers-nuggets.jpg",
+    categories: [{ name: "NBA", slug: "nba" }, { name: "Best Bets", slug: "best-bets" }],
+    league: "NBA",
+    publishedAt: "2025-01-04T09:30:00.000Z",
+  },
+  {
+    _id: "a-nba-2",
+    slug: "knicks-defense-and-the-under-trend",
+    title: "The Knicks’ Defense and the Under Trend",
+    description:
+      "Why New York’s drop coverage continues to cash unders against elite guards.",
+    thumbnail: "/ncaaf.jpg",
+    categories: [{ name: "NBA", slug: "nba" }, { name: "Trends", slug: "trends" }],
+    league: "NBA",
+    publishedAt: "2025-01-05T11:45:00.000Z",
+  },
+
+  // NCAAF
+  {
+    _id: "a-ncaaf-1",
+    slug: "betting-on-a-low-scoring-affair-in-the-sfc",
+    title: "Betting on a Low-Scoring Affair in the SFC?",
+    description:
+      "Two top-10 defenses collide. We dig into pace, finishing drives, and red-zone rates.",
+    thumbnail: "/images/blog/ncaaf-low-scoring.jpg",
+    categories: [{ name: "NCAAF", slug: "ncaaf" }, { name: "Totals", slug: "totals" }],
+    league: "NCAAF",
+    publishedAt: "2025-01-04T14:05:00.000Z",
+  },
+
+  // NCAAB
+  {
+    _id: "a-ncaab-1",
+    slug: "big-ten-clash-live-dog-on-the-road",
+    title: "Big Ten Clash: Live Dog on the Road",
+    description:
+      "Tempo edge and rim defense point to value on the visiting side.",
+    thumbnail: "/images/blog/ncaab-big-ten.jpg",
+    categories: [{ name: "NCAAB", slug: "ncaab" }, { name: "Underdogs", slug: "underdogs" }],
+    league: "NCAAB",
+    publishedAt: "2025-01-06T10:20:00.000Z",
+  },
+
+  // MLB
+  {
+    _id: "a-mlb-1",
+    slug: "strikeout-props-to-target-on-tuesday",
+    title: "Strikeout Props to Target on Tuesday",
+    description:
+      "Pitcher whiff rates and opponent chase profiles highlight two plus-EV K props.",
+    thumbnail: "/images/blog/mlb-strikeouts.jpg",
+    categories: [{ name: "MLB", slug: "mlb" }, { name: "Props", slug: "props" }],
+    league: "MLB",
+    publishedAt: "2025-01-07T08:00:00.000Z",
+  },
+
+  // UFC
+  {
+    _id: "a-ufc-1",
+    slug: "co-main-event-stylistic-breakdown",
+    title: "Co-Main Event: Stylistic Breakdown",
+    description:
+      "Southpaw countering vs. wrestle-heavy pressure — who dictates terms in the pocket?",
+    thumbnail: "/images/blog/ufc-co-main.jpg",
+    categories: [{ name: "UFC", slug: "ufc" }, { name: "Breakdown", slug: "breakdown" }],
+    league: "UFC",
+    publishedAt: "2025-01-08T18:30:00.000Z",
+  },
+  {
+    _id: "a-ufc-2",
+    slug: "three-underdogs-live-on-saturday",
+    title: "Three Underdogs Live on Saturday",
+    description:
+      "Cardio durability and minute-winning tools make these dogs interesting.",
+    thumbnail: "/nba.jpg",
+    categories: [{ name: "UFC", slug: "ufc" }, { name: "Underdogs", slug: "underdogs" }],
+    league: "UFC",
+    publishedAt: "2025-01-08T20:10:00.000Z",
+  },
+];

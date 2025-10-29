@@ -1,5 +1,13 @@
+import LatestCardSection from "@/components/article/LatestArticlesSection";
+import Hero from "@/components/Home/Hero";
+
 const article = () => {
-  return <div>article</div>;
+  return (
+    <div>
+      <Hero />
+      <LatestCardSection />
+    </div>
+  );
 };
 
 export default article;
