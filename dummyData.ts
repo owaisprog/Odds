@@ -1,0 +1,565 @@
+export interface FeaturedPrediction {
+  id: string
+  title: string
+  category: "Football" | "Basketball" | "Baseball" | "Hockey" | "College Football" | "College Basketball" | "MMA"
+  prediction: string
+  confidence: number
+  date: string
+  image: string
+  teams?: string
+}
+
+export interface FeaturedArticle {
+  id: string
+  title: string
+  subtitle: string
+  league: "NFL" | "NBA" | "MLB" | "NCAAF" | "NCAAB" | "UFC"
+  image: string
+  category: string
+  readTime: number
+}
+
+export interface UpcomingGame {
+  id: string
+  league: "NFL" | "NBA" | "MLB" | "NCAAF" | "NCAAB" | "UFC"
+  homeTeam: {
+    name: string
+    logo: string
+    seed?: number
+  }
+  awayTeam: {
+    name: string
+    logo: string
+    seed?: number
+  }
+  kickoffTime: string
+  date: string
+  venue?: string
+  odds: {
+    spread: string
+    total: string
+    moneyline: string
+  }
+  prediction: string
+  confidence: number
+}
+
+export interface NavLink {
+  label: string
+  href: string
+}
+
+export const featuredPredictions: FeaturedPrediction[] = [
+  {
+    id: "1",
+    title: "Kansas City Chiefs vs Buffalo Bills",
+    category: "Football",
+    prediction: "Chiefs to Win",
+    confidence: 87,
+    date: "Oct 28, 2025",
+    image: "/football-match-stadium.jpg",
+    teams: "Kansas City Chiefs vs Buffalo Bills",
+  },
+  {
+    id: "2",
+    title: "Boston Celtics vs Los Angeles Lakers",
+    category: "Basketball",
+    prediction: "Celtics to Win",
+    confidence: 81,
+    date: "Oct 28, 2025",
+    image: "/basketball-arena-game.jpg",
+    teams: "Boston Celtics vs Los Angeles Lakers",
+  },
+  {
+    id: "3",
+    title: "New York Yankees vs Houston Astros",
+    category: "Baseball",
+    prediction: "Yankees to Win",
+    confidence: 76,
+    date: "Oct 28, 2025",
+    image: "/cricket-match-action.jpg",
+    teams: "New York Yankees vs Houston Astros",
+  },
+]
+
+export const featuredArticles: FeaturedArticle[] = [
+  {
+    id: "1",
+    title: "Lakers vs Celtics: Championship Contenders",
+    subtitle: "Two of the league's best teams face off in a must-watch matchup",
+    league: "NBA",
+    image: "/nba.jpg",
+    category: "NBA",
+    readTime: 8,
+  },
+  {
+    id: "2",
+    title: "Chiefs Dominate Bills in AFC Showdown",
+    subtitle: "Kansas City's defense shines in critical playoff positioning game",
+    league: "NFL",
+    image: "/nfl.jpg",
+    category: "NFL",
+    readTime: 6,
+  },
+  {
+    id: "3",
+    title: "College Football: Top 10 Rankings Update",
+    subtitle: "Undefeated teams battle for playoff positioning",
+    league: "NCAAF",
+    image: "/ncaaf.jpg",
+    category: "College Football",
+    readTime: 7,
+  },
+]
+
+export const upcomingGames: UpcomingGame[] = [
+  // NFL Games
+  {
+    id: "nfl-1",
+    league: "NFL",
+    homeTeam: { name: "Dallas Cowboys", logo: "🏈" },
+    awayTeam: { name: "Philadelphia Eagles", logo: "🏈" },
+    kickoffTime: "Sun, Jan 5 • 1:00 PM ET",
+    date: "Jan 5, 2025",
+    venue: "AT&T Stadium",
+    odds: { spread: "PHI -3.5", total: "O/U 45.5", moneyline: "PHI -165" },
+    prediction: "Eagles Win",
+    confidence: 78,
+  },
+  {
+    id: "nfl-2",
+    league: "NFL",
+    homeTeam: { name: "Kansas City Chiefs", logo: "🏈" },
+    awayTeam: { name: "Buffalo Bills", logo: "🏈" },
+    kickoffTime: "Sun, Jan 5 • 4:25 PM ET",
+    date: "Jan 5, 2025",
+    venue: "Arrowhead Stadium",
+    odds: { spread: "KC -2.5", total: "O/U 47", moneyline: "KC -140" },
+    prediction: "Chiefs Win",
+    confidence: 82,
+  },
+  {
+    id: "nfl-3",
+    league: "NFL",
+    homeTeam: { name: "San Francisco 49ers", logo: "🏈" },
+    awayTeam: { name: "Detroit Lions", logo: "🏈" },
+    kickoffTime: "Sun, Jan 5 • 8:20 PM ET",
+    date: "Jan 5, 2025",
+    venue: "Levi's Stadium",
+    odds: { spread: "SF -4", total: "O/U 48", moneyline: "SF -180" },
+    prediction: "49ers Win",
+    confidence: 75,
+  },
+  {
+    id: "nfl-4",
+    league: "NFL",
+    homeTeam: { name: "Baltimore Ravens", logo: "🏈" },
+    awayTeam: { name: "Pittsburgh Steelers", logo: "🏈" },
+    kickoffTime: "Mon, Jan 6 • 8:15 PM ET",
+    date: "Jan 6, 2025",
+    venue: "M&T Bank Stadium",
+    odds: { spread: "BAL -5.5", total: "O/U 42", moneyline: "BAL -220" },
+    prediction: "Ravens Win",
+    confidence: 79,
+  },
+  {
+    id: "nfl-5",
+    league: "NFL",
+    homeTeam: { name: "Green Bay Packers", logo: "🏈" },
+    awayTeam: { name: "Chicago Bears", logo: "🏈" },
+    kickoffTime: "Sun, Jan 5 • 1:00 PM ET",
+    date: "Jan 5, 2025",
+    venue: "Lambeau Field",
+    odds: { spread: "GB -3", total: "O/U 44", moneyline: "GB -150" },
+    prediction: "Packers Win",
+    confidence: 71,
+  },
+  {
+    id: "nfl-6",
+    league: "NFL",
+    homeTeam: { name: "New England Patriots", logo: "🏈" },
+    awayTeam: { name: "Miami Dolphins", logo: "🏈" },
+    kickoffTime: "Sun, Jan 5 • 1:00 PM ET",
+    date: "Jan 5, 2025",
+    venue: "Gillette Stadium",
+    odds: { spread: "MIA -4", total: "O/U 41", moneyline: "MIA -180" },
+    prediction: "Dolphins Win",
+    confidence: 73,
+  },
+
+  // NBA Games
+  {
+    id: "nba-1",
+    league: "NBA",
+    homeTeam: { name: "Boston Celtics", logo: "🏀" },
+    awayTeam: { name: "Los Angeles Lakers", logo: "🏀" },
+    kickoffTime: "Sun, Jan 5 • 7:30 PM ET",
+    date: "Jan 5, 2025",
+    venue: "TD Garden",
+    odds: { spread: "BOS -4.5", total: "O/U 233.5", moneyline: "BOS -180" },
+    prediction: "Celtics Win",
+    confidence: 81,
+  },
+  {
+    id: "nba-2",
+    league: "NBA",
+    homeTeam: { name: "Denver Nuggets", logo: "🏀" },
+    awayTeam: { name: "Golden State Warriors", logo: "🏀" },
+    kickoffTime: "Sun, Jan 5 • 9:00 PM ET",
+    date: "Jan 5, 2025",
+    venue: "Ball Arena",
+    odds: { spread: "DEN -2", total: "O/U 228", moneyline: "DEN -110" },
+    prediction: "Nuggets Win",
+    confidence: 76,
+  },
+  {
+    id: "nba-3",
+    league: "NBA",
+    homeTeam: { name: "Miami Heat", logo: "🏀" },
+    awayTeam: { name: "New York Knicks", logo: "🏀" },
+    kickoffTime: "Sun, Jan 5 • 7:00 PM ET",
+    date: "Jan 5, 2025",
+    venue: "FTX Arena",
+    odds: { spread: "NYK -3", total: "O/U 215", moneyline: "NYK -140" },
+    prediction: "Knicks Win",
+    confidence: 74,
+  },
+  {
+    id: "nba-4",
+    league: "NBA",
+    homeTeam: { name: "Phoenix Suns", logo: "🏀" },
+    awayTeam: { name: "Dallas Mavericks", logo: "🏀" },
+    kickoffTime: "Sun, Jan 5 • 10:00 PM ET",
+    date: "Jan 5, 2025",
+    venue: "Footprint Center",
+    odds: { spread: "PHX -1.5", total: "O/U 225", moneyline: "PHX -110" },
+    prediction: "Suns Win",
+    confidence: 72,
+  },
+  {
+    id: "nba-5",
+    league: "NBA",
+    homeTeam: { name: "Milwaukee Bucks", logo: "🏀" },
+    awayTeam: { name: "Chicago Bulls", logo: "🏀" },
+    kickoffTime: "Sun, Jan 5 • 8:00 PM ET",
+    date: "Jan 5, 2025",
+    venue: "Fiserv Forum",
+    odds: { spread: "MIL -6", total: "O/U 220", moneyline: "MIL -240" },
+    prediction: "Bucks Win",
+    confidence: 83,
+  },
+  {
+    id: "nba-6",
+    league: "NBA",
+    homeTeam: { name: "Los Angeles Clippers", logo: "🏀" },
+    awayTeam: { name: "Sacramento Kings", logo: "🏀" },
+    kickoffTime: "Sun, Jan 5 • 10:30 PM ET",
+    date: "Jan 5, 2025",
+    venue: "Crypto.com Arena",
+    odds: { spread: "LAC -2.5", total: "O/U 231", moneyline: "LAC -130" },
+    prediction: "Clippers Win",
+    confidence: 70,
+  },
+
+  // MLB Games
+  {
+    id: "mlb-1",
+    league: "MLB",
+    homeTeam: { name: "New York Yankees", logo: "⚾" },
+    awayTeam: { name: "Houston Astros", logo: "⚾" },
+    kickoffTime: "Wed, Oct 29 • 8:00 PM ET",
+    date: "Oct 29, 2025",
+    venue: "Yankee Stadium",
+    odds: { spread: "NYY -1.5", total: "O/U 8.5", moneyline: "NYY -140" },
+    prediction: "Yankees Win",
+    confidence: 77,
+  },
+  {
+    id: "mlb-2",
+    league: "MLB",
+    homeTeam: { name: "Los Angeles Dodgers", logo: "⚾" },
+    awayTeam: { name: "Boston Red Sox", logo: "⚾" },
+    kickoffTime: "Wed, Oct 29 • 8:30 PM ET",
+    date: "Oct 29, 2025",
+    venue: "Dodger Stadium",
+    odds: { spread: "LAD -2", total: "O/U 9", moneyline: "LAD -160" },
+    prediction: "Dodgers Win",
+    confidence: 79,
+  },
+  {
+    id: "mlb-3",
+    league: "MLB",
+    homeTeam: { name: "Atlanta Braves", logo: "⚾" },
+    awayTeam: { name: "Philadelphia Phillies", logo: "⚾" },
+    kickoffTime: "Wed, Oct 29 • 7:00 PM ET",
+    date: "Oct 29, 2025",
+    venue: "Truist Park",
+    odds: { spread: "ATL -1", total: "O/U 8", moneyline: "ATL -120" },
+    prediction: "Braves Win",
+    confidence: 72,
+  },
+  {
+    id: "mlb-4",
+    league: "MLB",
+    homeTeam: { name: "Chicago Cubs", logo: "⚾" },
+    awayTeam: { name: "St. Louis Cardinals", logo: "⚾" },
+    kickoffTime: "Wed, Oct 29 • 8:00 PM ET",
+    date: "Oct 29, 2025",
+    venue: "Wrigley Field",
+    odds: { spread: "CHC -1.5", total: "O/U 8.5", moneyline: "CHC -135" },
+    prediction: "Cubs Win",
+    confidence: 68,
+  },
+  {
+    id: "mlb-5",
+    league: "MLB",
+    homeTeam: { name: "San Francisco Giants", logo: "⚾" },
+    awayTeam: { name: "San Diego Padres", logo: "⚾" },
+    kickoffTime: "Wed, Oct 29 • 10:00 PM ET",
+    date: "Oct 29, 2025",
+    venue: "Oracle Park",
+    odds: { spread: "SFG -0.5", total: "O/U 7.5", moneyline: "SFG -110" },
+    prediction: "Giants Win",
+    confidence: 65,
+  },
+  {
+    id: "mlb-6",
+    league: "MLB",
+    homeTeam: { name: "Toronto Blue Jays", logo: "⚾" },
+    awayTeam: { name: "Tampa Bay Rays", logo: "⚾" },
+    kickoffTime: "Wed, Oct 29 • 7:00 PM ET",
+    date: "Oct 29, 2025",
+    venue: "Rogers Centre",
+    odds: { spread: "TOR -1", total: "O/U 8", moneyline: "TOR -120" },
+    prediction: "Blue Jays Win",
+    confidence: 70,
+  },
+
+  // NCAAF Games
+  {
+    id: "ncaaf-1",
+    league: "NCAAF",
+    homeTeam: { name: "Alabama Crimson Tide", logo: "🏈" },
+    awayTeam: { name: "Georgia Bulldogs", logo: "🏈" },
+    kickoffTime: "Sat, Jan 4 • 3:30 PM ET",
+    date: "Jan 4, 2025",
+    venue: "Bryant-Denny Stadium",
+    odds: { spread: "ALA -3", total: "O/U 52", moneyline: "ALA -150" },
+    prediction: "Alabama Win",
+    confidence: 76,
+  },
+  {
+    id: "ncaaf-2",
+    league: "NCAAF",
+    homeTeam: { name: "Ohio State Buckeyes", logo: "🏈" },
+    awayTeam: { name: "Michigan Wolverines", logo: "🏈" },
+    kickoffTime: "Sat, Jan 4 • 7:30 PM ET",
+    date: "Jan 4, 2025",
+    venue: "Ohio Stadium",
+    odds: { spread: "OSU -4.5", total: "O/U 54", moneyline: "OSU -180" },
+    prediction: "Ohio State Win",
+    confidence: 80,
+  },
+  {
+    id: "ncaaf-3",
+    league: "NCAAF",
+    homeTeam: { name: "Clemson Tigers", logo: "🏈" },
+    awayTeam: { name: "South Carolina Gamecocks", logo: "🏈" },
+    kickoffTime: "Sat, Jan 4 • 1:00 PM ET",
+    date: "Jan 4, 2025",
+    venue: "Memorial Stadium",
+    odds: { spread: "CLE -7", total: "O/U 50", moneyline: "CLE -260" },
+    prediction: "Clemson Win",
+    confidence: 84,
+  },
+  {
+    id: "ncaaf-4",
+    league: "NCAAF",
+    homeTeam: { name: "Texas Longhorns", logo: "🏈" },
+    awayTeam: { name: "Oklahoma Sooners", logo: "🏈" },
+    kickoffTime: "Sat, Jan 4 • 4:00 PM ET",
+    date: "Jan 4, 2025",
+    venue: "Darrell K Royal Stadium",
+    odds: { spread: "TEX -5", total: "O/U 56", moneyline: "TEX -200" },
+    prediction: "Texas Win",
+    confidence: 78,
+  },
+  {
+    id: "ncaaf-5",
+    league: "NCAAF",
+    homeTeam: { name: "LSU Tigers", logo: "🏈" },
+    awayTeam: { name: "Florida Gators", logo: "🏈" },
+    kickoffTime: "Sat, Jan 4 • 2:30 PM ET",
+    date: "Jan 4, 2025",
+    venue: "Tiger Stadium",
+    odds: { spread: "LSU -6", total: "O/U 51", moneyline: "LSU -220" },
+    prediction: "LSU Win",
+    confidence: 81,
+  },
+  {
+    id: "ncaaf-6",
+    league: "NCAAF",
+    homeTeam: { name: "Notre Dame Fighting Irish", logo: "🏈" },
+    awayTeam: { name: "USC Trojans", logo: "🏈" },
+    kickoffTime: "Sat, Jan 4 • 8:00 PM ET",
+    date: "Jan 4, 2025",
+    venue: "Notre Dame Stadium",
+    odds: { spread: "ND -2.5", total: "O/U 53", moneyline: "ND -130" },
+    prediction: "Notre Dame Win",
+    confidence: 74,
+  },
+
+  // NCAAB Games
+  {
+    id: "ncaab-1",
+    league: "NCAAB",
+    homeTeam: { name: "Duke Blue Devils", logo: "🏀" },
+    awayTeam: { name: "North Carolina Tar Heels", logo: "🏀" },
+    kickoffTime: "Sat, Jan 4 • 6:00 PM ET",
+    date: "Jan 4, 2025",
+    venue: "Cameron Indoor Stadium",
+    odds: { spread: "DUKE -3.5", total: "O/U 155", moneyline: "DUKE -160" },
+    prediction: "Duke Win",
+    confidence: 77,
+  },
+  {
+    id: "ncaab-2",
+    league: "NCAAB",
+    homeTeam: { name: "Kansas Jayhawks", logo: "🏀" },
+    awayTeam: { name: "Texas Tech Red Raiders", logo: "🏀" },
+    kickoffTime: "Sat, Jan 4 • 8:00 PM ET",
+    date: "Jan 4, 2025",
+    venue: "Allen Fieldhouse",
+    odds: { spread: "KAN -5", total: "O/U 158", moneyline: "KAN -200" },
+    prediction: "Kansas Win",
+    confidence: 79,
+  },
+  {
+    id: "ncaab-3",
+    league: "NCAAB",
+    homeTeam: { name: "UCLA Bruins", logo: "🏀" },
+    awayTeam: { name: "USC Trojans", logo: "🏀" },
+    kickoffTime: "Sat, Jan 4 • 9:00 PM ET",
+    date: "Jan 4, 2025",
+    venue: "Pauley Pavilion",
+    odds: { spread: "UCLA -2", total: "O/U 152", moneyline: "UCLA -120" },
+    prediction: "UCLA Win",
+    confidence: 72,
+  },
+  {
+    id: "ncaab-4",
+    league: "NCAAB",
+    homeTeam: { name: "Kentucky Wildcats", logo: "🏀" },
+    awayTeam: { name: "Tennessee Volunteers", logo: "🏀" },
+    kickoffTime: "Sat, Jan 4 • 7:30 PM ET",
+    date: "Jan 4, 2025",
+    venue: "Rupp Arena",
+    odds: { spread: "KEN -4", total: "O/U 156", moneyline: "KEN -170" },
+    prediction: "Kentucky Win",
+    confidence: 75,
+  },
+  {
+    id: "ncaab-5",
+    league: "NCAAB",
+    homeTeam: { name: "Arizona Wildcats", logo: "🏀" },
+    awayTeam: { name: "Colorado Buffaloes", logo: "🏀" },
+    kickoffTime: "Sat, Jan 4 • 10:00 PM ET",
+    date: "Jan 4, 2025",
+    venue: "McKale Center",
+    odds: { spread: "ARI -6", total: "O/U 160", moneyline: "ARI -240" },
+    prediction: "Arizona Win",
+    confidence: 81,
+  },
+  {
+    id: "ncaab-6",
+    league: "NCAAB",
+    homeTeam: { name: "Gonzaga Bulldogs", logo: "🏀" },
+    awayTeam: { name: "BYU Cougars", logo: "🏀" },
+    kickoffTime: "Sat, Jan 4 • 8:30 PM ET",
+    date: "Jan 4, 2025",
+    venue: "McCarthey Athletic Center",
+    odds: { spread: "GONZ -3.5", total: "O/U 154", moneyline: "GONZ -160" },
+    prediction: "Gonzaga Win",
+    confidence: 76,
+  },
+
+  // UFC Events
+  {
+    id: "ufc-1",
+    league: "UFC",
+    homeTeam: { name: "Jon Jones", logo: "🥊" },
+    awayTeam: { name: "Alex Pereira", logo: "🥊" },
+    kickoffTime: "Sat, Jan 11 • 10:00 PM ET",
+    date: "Jan 11, 2025",
+    venue: "Madison Square Garden",
+    odds: { spread: "JJ -2.5", total: "O/U 4.5", moneyline: "JJ -140" },
+    prediction: "Jones Win",
+    confidence: 78,
+  },
+  {
+    id: "ufc-2",
+    league: "UFC",
+    homeTeam: { name: "Islam Makhachev", logo: "🥊" },
+    awayTeam: { name: "Arman Tsarukyan", logo: "🥊" },
+    kickoffTime: "Sat, Jan 11 • 8:30 PM ET",
+    date: "Jan 11, 2025",
+    venue: "Madison Square Garden",
+    odds: { spread: "IM -3", total: "O/U 4", moneyline: "IM -160" },
+    prediction: "Makhachev Win",
+    confidence: 81,
+  },
+  {
+    id: "ufc-3",
+    league: "UFC",
+    homeTeam: { name: "Sean Strickland", logo: "🥊" },
+    awayTeam: { name: "Dricus du Plessis", logo: "🥊" },
+    kickoffTime: "Sat, Jan 11 • 7:00 PM ET",
+    date: "Jan 11, 2025",
+    venue: "Madison Square Garden",
+    odds: { spread: "SS -1.5", total: "O/U 4.5", moneyline: "SS -120" },
+    prediction: "Strickland Win",
+    confidence: 74,
+  },
+  {
+    id: "ufc-4",
+    league: "UFC",
+    homeTeam: { name: "Ilia Topuria", logo: "🥊" },
+    awayTeam: { name: "Max Holloway", logo: "🥊" },
+    kickoffTime: "Sat, Jan 11 • 9:00 PM ET",
+    date: "Jan 11, 2025",
+    venue: "Madison Square Garden",
+    odds: { spread: "IT -2", total: "O/U 4.5", moneyline: "IT -140" },
+    prediction: "Topuria Win",
+    confidence: 76,
+  },
+  {
+    id: "ufc-5",
+    league: "UFC",
+    homeTeam: { name: "Colby Covington", logo: "🥊" },
+    awayTeam: { name: "Leon Edwards", logo: "🥊" },
+    kickoffTime: "Sat, Jan 11 • 6:00 PM ET",
+    date: "Jan 11, 2025",
+    venue: "Madison Square Garden",
+    odds: { spread: "CC -1", total: "O/U 4", moneyline: "CC -110" },
+    prediction: "Covington Win",
+    confidence: 71,
+  },
+  {
+    id: "ufc-6",
+    league: "UFC",
+    homeTeam: { name: "Khamzat Chimaev", logo: "🥊" },
+    awayTeam: { name: "Kamaru Usman", logo: "🥊" },
+    kickoffTime: "Sat, Jan 11 • 5:30 PM ET",
+    date: "Jan 11, 2025",
+    venue: "Madison Square Garden",
+    odds: { spread: "KC -2.5", total: "O/U 4.5", moneyline: "KC -150" },
+    prediction: "Chimaev Win",
+    confidence: 79,
+  },
+]
+
+export const navLinks: NavLink[] = [
+  { label: "Predictions", href: "/predictions" },
+  { label: "Leagues", href: "/leagues" },
+  { label: "Analysis", href: "/analysis" },
+]

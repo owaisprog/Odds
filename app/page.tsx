@@ -1,9 +1,11 @@
-import Image from "next/image";
+import Hero from "@/components/Home/Hero";
+import UpcomingGames from "@/components/Home/UpcomingGames";
 
 export default function Home() {
   return (
-    <div className="flex items-center justify-center bg-zinc-50 font-sans ">
-      ODDS
-    </div>
+    <main className="">
+      <Hero />
+      <UpcomingGames />
+    </main>
   );
 }
