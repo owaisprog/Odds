@@ -1,9 +1,31 @@
 {
   "functions": {
-    "app/**/route.js": {
+    "app/**/route.ts": {
+      "runtime": "nodejs22.x",
       "includeFiles": [
-        "node_modules/@prisma/client/**/*",
-        "node_modules/.prisma/client/**/*"
+        "node_modules/.prisma/client/**",
+        "node_modules/@prisma/client/**"
+      ]
+    },
+    "app/**/route.js": {
+      "runtime": "nodejs22.x",
+      "includeFiles": [
+        "node_modules/.prisma/client/**",
+        "node_modules/@prisma/client/**"
+      ]
+    },
+    "pages/api/**/*.ts": {
+      "runtime": "nodejs22.x",
+      "includeFiles": [
+        "node_modules/.prisma/client/**",
+        "node_modules/@prisma/client/**"
+      ]
+    },
+    "pages/api/**/*.js": {
+      "runtime": "nodejs22.x",
+      "includeFiles": [
+        "node_modules/.prisma/client/**",
+        "node_modules/@prisma/client/**"
       ]
     }
   }
