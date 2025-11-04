@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic"; // always fresh for admin
+export const runtime = "nodejs";       // ✅ important
 
 export async function GET() {
   try {
