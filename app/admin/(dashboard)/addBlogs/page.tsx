@@ -108,11 +108,11 @@ export default function AdminAddBlogPage() {
       .toLowerCase()
       .replace(/ /g, "-")
       .replace(/[^\w-]+/g, "");
-    const league = "NFL";
+
     const payload = {
       ...data,
       slug,
-      league,
+
       categories,
       published,
       content,

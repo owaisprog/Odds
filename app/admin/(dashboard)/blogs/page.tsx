@@ -2,15 +2,27 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import type { BlogArticle } from "@/dummyData";
-import { blogArticles } from "@/dummyData";
 
 type FilterKey = "all" | "published" | "draft";
 
+type CategoryChip = { name: string; slug: string };
+type ApiBlog = {
+  _id: string;
+  slug: string;
+  title: string;
+  description: string;
+  thumbnail: string | null;
+  categories: CategoryChip[];
+  isFeatured: boolean;
+  published: boolean;
+  publishedAt: string; // ISO
+};
+
 export default function AdminBlogsPage() {
-  const [blogs, setBlogs] = useState<BlogArticle[]>([]);
+  const [blogs, setBlogs] = useState<ApiBlog[]>([]);
   const [filter, setFilter] = useState<FilterKey>("all");
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // button-level spinners
   const [toggleLoadingIds, setToggleLoadingIds] = useState<Set<string>>(
@@ -28,17 +40,32 @@ export default function AdminBlogsPage() {
   const [popupContent, setPopupContent] = useState<string>("");
 
   useEffect(() => {
-    // Load from dummy data (clone so we can mutate locally)
-    setLoading(true);
-    const timer = setTimeout(() => {
-      const sorted = [...blogArticles].sort(
-        (a, b) =>
-          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-      );
-      setBlogs(sorted);
-      setLoading(false);
-    }, 200); // tiny delay to show loading state
-    return () => clearTimeout(timer);
+    const fetchBlogs = async () => {
+      setLoading(true);
+      setErrorMsg(null);
+      try {
+        const res = await fetch("/api/getAllBlogs", { cache: "no-store" });
+        if (!res.ok) throw new Error("Failed to load blogs");
+        const data: ApiBlog[] = await res.json();
+
+        // ensure stable fallback shapes
+        const safeData = data.map((b) => ({
+          ...b,
+          categories: Array.isArray(b.categories) ? b.categories : [],
+          description: b.description ?? "",
+          thumbnail: b.thumbnail ?? "",
+        }));
+
+        setBlogs(safeData);
+      } catch (e: any) {
+        console.error(e);
+        setErrorMsg(e?.message || "Failed to load blogs.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
   }, []);
 
   const filteredBlogs = useMemo(() => {
@@ -67,7 +94,7 @@ export default function AdminBlogsPage() {
       return s;
     });
 
-  // actions (local state only)
+  // actions (still local-only; wire these to PUT/DELETE later if desired)
   const togglePublished = (id: string) => {
     withSet(setToggleLoadingIds, id, true);
     setTimeout(() => {
@@ -107,7 +134,7 @@ export default function AdminBlogsPage() {
       </h1>
       <p className="font-poppins text-gray-600 mt-2 mb-8 max-w-2xl">
         Filter, edit, feature, publish or delete your content. This admin view
-        reads from local dummy data.
+        reads from your API.
       </p>
 
       {/* Filters */}
@@ -133,12 +160,14 @@ export default function AdminBlogsPage() {
         })}
       </div>
 
-      {/* Loading / Empty / Grid */}
+      {/* Loading / Error / Empty / Grid */}
       {loading ? (
         <div className="flex items-center gap-3 py-24 text-gray-500 font-poppins">
           <Spinner />
           Loading blogs…
         </div>
+      ) : errorMsg ? (
+        <div className="text-red-600 py-24 font-poppins">{errorMsg}</div>
       ) : filteredBlogs.length === 0 ? (
         <div className="text-center text-gray-600 py-24 font-poppins">
           No blogs found.

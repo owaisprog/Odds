@@ -485,14 +485,19 @@ export const navLinks: NavLink[] = [
 
 
 // ---------- Types ----------
-export type LeagueKey = "NFL" | "NBA" | "NCAAF" | "NCAAB" | "MLB" | "UFC";
 
+// types.ts (or alongside your dummy data)
 export type ArticleCategory = {
   name: string;
   slug: string;
 };
 
-// LeagueKey is defined elsewhere in your project
+export type ContentBlock = {
+  type: "heading" | "subheading" | "text" | "image";
+  content: string;       // text content or image URL
+  description?: string;  // optional caption for images
+};
+
 export type BlogArticle = {
   _id: string;
   slug: string;
@@ -500,14 +505,13 @@ export type BlogArticle = {
   description: string;
   thumbnail: string; // can be local path or external URL
   categories: ArticleCategory[];
-  league: LeagueKey;
   publishedAt: string; // ISO date
   isFeatured?: boolean;
-  published: boolean; // NEW: control if article is live/visible
+  published: boolean;
+  content: ContentBlock[]; // NEW
 };
 
 // ---------- Data ----------
-
 export const blogArticles: BlogArticle[] = [
   {
     _id: "a-nfl-1",
@@ -522,10 +526,28 @@ export const blogArticles: BlogArticle[] = [
       { name: "NFL", slug: "nfl" },
       { name: "Analysis", slug: "analysis" },
     ],
-    league: "NFL",
     publishedAt: "2025-01-02T15:10:00.000Z",
     isFeatured: false,
     published: false,
+    content: [
+      { type: "heading", content: "Matchup Overview" },
+      {
+        type: "text",
+        content:
+          "The 49ers’ early-down run efficiency creates favorable second-and-short situations that limit obvious passing downs.",
+      },
+      { type: "subheading", content: "Trenches & Scheme" },
+      {
+        type: "text",
+        content:
+          "Outside zone with split-flow looks stress the second level; expect motion to force linebackers to declare.",
+      },
+      {
+        type: "text",
+        content:
+          "If San Francisco sustains drives, explosive play rate rises off play-action crossers.",
+      },
+    ],
   },
   {
     _id: "a-nfl-2",
@@ -540,10 +562,28 @@ export const blogArticles: BlogArticle[] = [
       { name: "NFL", slug: "nfl" },
       { name: "Picks", slug: "picks" },
     ],
-    league: "NFL",
     publishedAt: "2025-01-03T12:00:00.000Z",
     isFeatured: true,
     published: true,
+    content: [
+      { type: "heading", content: "How the Lines Moved" },
+      {
+        type: "text",
+        content:
+          "Market opened near a field goal and tightened as injury reports favored the home front seven.",
+      },
+      { type: "subheading", content: "Attack Surfaces" },
+      {
+        type: "text",
+        content:
+          "Dallas can leverage quick game to neutralize edge pressure; look for slant/flat combos and RB angle routes.",
+      },
+      {
+        type: "text",
+        content:
+          "Prop lean: WR targets over if single-high shells persist on early downs.",
+      },
+    ],
   },
 
   // NBA
@@ -560,10 +600,28 @@ export const blogArticles: BlogArticle[] = [
       { name: "NBA", slug: "nba" },
       { name: "Best Bets", slug: "best-bets" },
     ],
-    league: "NBA",
     publishedAt: "2025-01-04T09:30:00.000Z",
     isFeatured: true,
     published: false,
+    content: [
+      { type: "heading", content: "Glass Advantage" },
+      {
+        type: "text",
+        content:
+          "Second-chance points swing the median outcome; Denver’s ORB% edge pushes the total upward.",
+      },
+      { type: "subheading", content: "Tempo & Shot Quality" },
+      {
+        type: "text",
+        content:
+          "If transition frequency rises, Lakers’ rim attempts go up but midrange volume also increases.",
+      },
+      {
+        type: "text",
+        content:
+          "Spread model: Nuggets -3.5 fair; total leans over if FT rate climbs above league average.",
+      },
+    ],
   },
   {
     _id: "a-nba-2",
@@ -576,10 +634,23 @@ export const blogArticles: BlogArticle[] = [
       { name: "NBA", slug: "nba" },
       { name: "Trends", slug: "trends" },
     ],
-    league: "NBA",
     publishedAt: "2025-01-05T11:45:00.000Z",
     isFeatured: false,
-    published: true, // example draft/unpublished
+    published: true,
+    content: [
+      { type: "heading", content: "Drop Coverage Discipline" },
+      {
+        type: "text",
+        content:
+          "New York concedes pull-up midrange while walling off the rim; star guards settle for low-EV looks.",
+      },
+      { type: "subheading", content: "Rotation Tightening" },
+      {
+        type: "text",
+        content:
+          "Shorter rotations reduce defensive mistakes and foul variance, supporting unders in tight games.",
+      },
+    ],
   },
 
   // NCAAF
@@ -596,10 +667,23 @@ export const blogArticles: BlogArticle[] = [
       { name: "NCAAF", slug: "ncaaf" },
       { name: "Totals", slug: "totals" },
     ],
-    league: "NCAAF",
     publishedAt: "2025-01-04T14:05:00.000Z",
     isFeatured: true,
     published: true,
+    content: [
+      { type: "heading", content: "Pace & Possessions" },
+      {
+        type: "text",
+        content:
+          "Both teams rank bottom-third in seconds per snap; fewer drives support a lower total.",
+      },
+      { type: "subheading", content: "Finishing Drives" },
+      {
+        type: "text",
+        content:
+          "Red-zone TD% trends down when facing top-25 havoc rates; field goals become more likely.",
+      },
+    ],
   },
 
   // NCAAB
@@ -616,10 +700,23 @@ export const blogArticles: BlogArticle[] = [
       { name: "NCAAB", slug: "ncaab" },
       { name: "Underdogs", slug: "underdogs" },
     ],
-    league: "NCAAB",
     publishedAt: "2025-01-06T10:20:00.000Z",
     isFeatured: false,
-    published: true, // example draft/unpublished
+    published: true,
+    content: [
+      { type: "heading", content: "Road Dog Profile" },
+      {
+        type: "text",
+        content:
+          "Superior rim deterrence and defensive rebounding keep games within one or two possessions late.",
+      },
+      { type: "subheading", content: "Half-Court Offense" },
+      {
+        type: "text",
+        content:
+          "Backdoor sets vs. overplays generate layups; expect late shot-clock post touches to slow tempo.",
+      },
+    ],
   },
 
   // MLB
@@ -636,10 +733,23 @@ export const blogArticles: BlogArticle[] = [
       { name: "MLB", slug: "mlb" },
       { name: "Props", slug: "props" },
     ],
-    league: "MLB",
     publishedAt: "2025-01-07T08:00:00.000Z",
     isFeatured: false,
     published: true,
+    content: [
+      { type: "heading", content: "Pitch Model Signals" },
+      {
+        type: "text",
+        content:
+          "High CSW% sliders vs. elevated chase rates create pathways to 7+ Ks at modest pitch counts.",
+      },
+      { type: "subheading", content: "Opposition Swing Paths" },
+      {
+        type: "text",
+        content:
+          "Uppercut tendencies meet elevated four-seamers; whiffs spike when ahead in the count.",
+      },
+    ],
   },
 
   // UFC
@@ -656,10 +766,23 @@ export const blogArticles: BlogArticle[] = [
       { name: "UFC", slug: "ufc" },
       { name: "Breakdown", slug: "breakdown" },
     ],
-    league: "UFC",
     publishedAt: "2025-01-08T18:30:00.000Z",
     isFeatured: false,
     published: true,
+    content: [
+      { type: "heading", content: "Range Management" },
+      {
+        type: "text",
+        content:
+          "Southpaw counters punish squared entries; level changes must be disguised behind feints.",
+      },
+      { type: "subheading", content: "Cardio & Minute-Winning" },
+      {
+        type: "text",
+        content:
+          "If the pressure fighter can chain wrestle past R2, control time becomes decisive on the cards.",
+      },
+    ],
   },
   {
     _id: "a-ufc-2",
@@ -672,9 +795,22 @@ export const blogArticles: BlogArticle[] = [
       { name: "UFC", slug: "ufc" },
       { name: "Underdogs", slug: "underdogs" },
     ],
-    league: "UFC",
     publishedAt: "2025-01-08T20:10:00.000Z",
     isFeatured: false,
-    published: true, // example draft/unpublished
+    published: true,
+    content: [
+      { type: "heading", content: "Live Dog Criteria" },
+      {
+        type: "text",
+        content:
+          "Durability plus attritional offense (low output, high accuracy) can flip rounds late.",
+      },
+      { type: "subheading", content: "Paths to Upsets" },
+      {
+        type: "text",
+        content:
+          "Counter-lefts and body work tax forward pressure; look for late momentum swings in R3.",
+      },
+    ],
   },
 ];

@@ -29,7 +29,6 @@ model Article {
   title       String
   description String
   thumbnail   String
-  league      String // e.g. "NFL", "NBA"
   publishedAt DateTime
   isFeatured  Boolean? @default(false)
   published   Boolean  @default(false)
