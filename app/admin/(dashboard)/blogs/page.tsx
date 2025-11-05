@@ -6,8 +6,10 @@ import Link from "next/link";
 type FilterKey = "all" | "published" | "draft";
 
 type CategoryChip = { name: string; slug: string };
+
+// Final, normalized shape used by the UI
 type ApiBlog = {
-  _id: string;
+  id: number; // ✅ numeric id
   slug: string;
   title: string;
   description: string;
@@ -24,18 +26,16 @@ export default function AdminBlogsPage() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // button-level spinners
-  const [toggleLoadingIds, setToggleLoadingIds] = useState<Set<string>>(
+  const [toggleLoadingIds, setToggleLoadingIds] = useState<Set<number>>(
     new Set()
   );
-  const [deleteLoadingIds, setDeleteLoadingIds] = useState<Set<string>>(
+  const [deleteLoadingIds, setDeleteLoadingIds] = useState<Set<number>>(
     new Set()
   );
-  const [featuredLoadingIds, setFeaturedLoadingIds] = useState<Set<string>>(
+  const [featuredLoadingIds, setFeaturedLoadingIds] = useState<Set<number>>(
     new Set()
   );
 
-  // popup for truncated text
   const [popupOpen, setPopupOpen] = useState(false);
   const [popupContent, setPopupContent] = useState<string>("");
 
@@ -46,15 +46,40 @@ export default function AdminBlogsPage() {
       try {
         const res = await fetch("/api/getAllBlogs", { cache: "no-store" });
         if (!res.ok) throw new Error("Failed to load blogs");
-        const data: ApiBlog[] = await res.json();
 
-        // ensure stable fallback shapes
-        const safeData = data.map((b) => ({
-          ...b,
-          categories: Array.isArray(b.categories) ? b.categories : [],
-          description: b.description ?? "",
-          thumbnail: b.thumbnail ?? "",
-        }));
+        const raw: any[] = await res.json();
+
+        const safeData: ApiBlog[] = raw
+          .map((b) => {
+            const idCandidate = b?.id ?? b?._id ?? b?.articleId;
+
+            const idNum =
+              typeof idCandidate === "number"
+                ? idCandidate
+                : typeof idCandidate === "string" &&
+                  idCandidate.trim() &&
+                  /^\d+$/.test(idCandidate.trim())
+                ? parseInt(idCandidate.trim(), 10)
+                : NaN;
+
+            if (!Number.isInteger(idNum)) {
+              console.warn("Skipping blog with invalid id:", idCandidate, b);
+              return null;
+            }
+
+            return {
+              id: idNum,
+              slug: String(b.slug ?? ""),
+              title: String(b.title ?? ""),
+              description: String(b.description ?? ""),
+              thumbnail: b.thumbnail ?? "",
+              categories: Array.isArray(b.categories) ? b.categories : [],
+              isFeatured: Boolean(b.isFeatured),
+              published: Boolean(b.published),
+              publishedAt: String(b.publishedAt ?? ""),
+            } as ApiBlog;
+          })
+          .filter((x): x is ApiBlog => Boolean(x));
 
         setBlogs(safeData);
       } catch (e: any) {
@@ -64,7 +89,6 @@ export default function AdminBlogsPage() {
         setLoading(false);
       }
     };
-
     fetchBlogs();
   }, []);
 
@@ -79,13 +103,12 @@ export default function AdminBlogsPage() {
     }
   }, [blogs, filter]);
 
-  // helpers
   const truncate = (str: string, max = 30) =>
     str.length > max ? str.slice(0, max) + "…" : str;
 
   const withSet = (
-    setter: React.Dispatch<React.SetStateAction<Set<string>>>,
-    id: string,
+    setter: React.Dispatch<React.SetStateAction<Set<number>>>,
+    id: number,
     add: boolean
   ) =>
     setter((prev) => {
@@ -94,41 +117,71 @@ export default function AdminBlogsPage() {
       return s;
     });
 
-  // actions (still local-only; wire these to PUT/DELETE later if desired)
-  const togglePublished = (id: string) => {
+  const togglePublished = (id: number) => {
     withSet(setToggleLoadingIds, id, true);
     setTimeout(() => {
       setBlogs((prev) =>
-        prev.map((b) => (b._id === id ? { ...b, published: !b.published } : b))
+        prev.map((b) => (b.id === id ? { ...b, published: !b.published } : b))
       );
       withSet(setToggleLoadingIds, id, false);
     }, 300);
   };
 
-  const toggleFeatured = (id: string) => {
+  // replace this function in Code A
+  const toggleFeatured = async (id: number) => {
     withSet(setFeaturedLoadingIds, id, true);
-    setTimeout(() => {
+    try {
+      const res = await fetch(`/api/toggleFeatured/${id}`, { method: "PUT" });
+
+      // Handle API errors (including the 9-featured cap)
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        const msg = body?.error || "Failed to update featured status.";
+        alert(msg);
+        return;
+      }
+
+      // Update just the one card from server truth
+      const updated: { id: number; isFeatured: boolean } = await res.json();
       setBlogs((prev) =>
         prev.map((b) =>
-          b._id === id ? { ...b, isFeatured: !b.isFeatured } : b
+          b.id === updated.id ? { ...b, isFeatured: updated.isFeatured } : b
         )
       );
+    } catch (err: any) {
+      alert(err?.message || "Failed to update featured status.");
+    } finally {
       withSet(setFeaturedLoadingIds, id, false);
-    }, 300);
+    }
   };
 
-  const deleteBlog = (id: string, title: string) => {
+  // server-backed delete by numeric id
+  const deleteBlog = async (id: number, title: string) => {
     if (!confirm(`Delete "${title}"?`)) return;
-    withSet(setDeleteLoadingIds, id, true);
-    setTimeout(() => {
-      setBlogs((prev) => prev.filter((b) => b._id !== id));
-      withSet(setDeleteLoadingIds, id, false);
-    }, 300);
+
+    const intId = Number(id);
+    if (!Number.isInteger(intId)) {
+      alert("Invalid numeric id on this blog; cannot delete.");
+      return;
+    }
+
+    withSet(setDeleteLoadingIds, intId, true);
+    try {
+      const res = await fetch(`/api/deleteBlog/${intId}`, { method: "DELETE" });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error || "Failed to delete blog.");
+      }
+      setBlogs((prev) => prev.filter((b) => b.id !== intId));
+    } catch (err: any) {
+      alert(err?.message || "Failed to delete blog.");
+    } finally {
+      withSet(setDeleteLoadingIds, intId, false);
+    }
   };
 
   return (
     <div className="min-h-screen max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-      {/* Heading */}
       <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl mt-10 text-[#263E4D]">
         Blogs Management
       </h1>
@@ -137,7 +190,6 @@ export default function AdminBlogsPage() {
         reads from your API.
       </p>
 
-      {/* Filters */}
       <div className="flex gap-3 mb-8 w-full sm:w-auto">
         {(["all", "published", "draft"] as FilterKey[]).map((key) => {
           const active = filter === key;
@@ -160,7 +212,6 @@ export default function AdminBlogsPage() {
         })}
       </div>
 
-      {/* Loading / Error / Empty / Grid */}
       {loading ? (
         <div className="flex items-center gap-3 py-24 text-gray-500 font-poppins">
           <Spinner />
@@ -176,10 +227,9 @@ export default function AdminBlogsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredBlogs.map((blog) => (
             <div
-              key={blog._id}
+              key={blog.id}
               className="bg-white rounded-xl shadow-md hover:shadow-lg transition overflow-hidden flex flex-col"
             >
-              {/* Thumbnail + overlay actions */}
               <div className="relative group">
                 <img
                   src={blog.thumbnail || "/placeholder.svg"}
@@ -187,16 +237,15 @@ export default function AdminBlogsPage() {
                   className="w-full h-56 object-cover"
                 />
                 <div className="absolute inset-x-0 top-0 px-3 py-2 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
-                  {/* Feature */}
                   <button
-                    onClick={() => toggleFeatured(blog._id)}
-                    disabled={featuredLoadingIds.has(blog._id)}
+                    onClick={() => toggleFeatured(blog.id)}
+                    disabled={featuredLoadingIds.has(blog.id)}
                     title={
                       blog.isFeatured ? "Remove Featured" : "Mark as Featured"
                     }
                     className="rounded-md bg-white/90 hover:bg-white shadow px-2 py-1"
                   >
-                    {featuredLoadingIds.has(blog._id) ? (
+                    {featuredLoadingIds.has(blog.id) ? (
                       <Spinner tiny />
                     ) : blog.isFeatured ? (
                       <IconStarSolid className="text-yellow-500" />
@@ -204,14 +253,13 @@ export default function AdminBlogsPage() {
                       <IconStarOutline />
                     )}
                   </button>
-                  {/* Delete */}
                   <button
-                    onClick={() => deleteBlog(blog._id, blog.title)}
-                    disabled={deleteLoadingIds.has(blog._id)}
+                    onClick={() => deleteBlog(blog.id, blog.title)}
+                    disabled={deleteLoadingIds.has(blog.id)}
                     title="Delete"
                     className="rounded-md bg-white/90 hover:bg-white shadow px-2 py-1"
                   >
-                    {deleteLoadingIds.has(blog._id) ? (
+                    {deleteLoadingIds.has(blog.id) ? (
                       <Spinner tiny />
                     ) : (
                       <IconTrash />
@@ -220,7 +268,6 @@ export default function AdminBlogsPage() {
                 </div>
               </div>
 
-              {/* Body */}
               <div className="p-5 flex flex-col flex-1">
                 <h3 className="font-playfair text-xl text-[#263E4D] mb-2">
                   {blog.title.length > 36 ? (
@@ -262,7 +309,6 @@ export default function AdminBlogsPage() {
                   )}
                 </p>
 
-                {/* Chips */}
                 <div className="mt-4 flex flex-wrap gap-2">
                   {blog.categories.map((c) => (
                     <span
@@ -274,7 +320,6 @@ export default function AdminBlogsPage() {
                   ))}
                 </div>
 
-                {/* Actions */}
                 <div className="mt-5 grid grid-cols-2 gap-3">
                   <Link
                     href={`/article/${blog.slug}`}
@@ -293,10 +338,9 @@ export default function AdminBlogsPage() {
                   </Link>
                 </div>
 
-                {/* Publish/Draft toggle */}
                 <button
-                  onClick={() => togglePublished(blog._id)}
-                  disabled={toggleLoadingIds.has(blog._id)}
+                  onClick={() => togglePublished(blog.id)}
+                  disabled={toggleLoadingIds.has(blog.id)}
                   className={`mt-4 w-full rounded-md py-2.5 font-poppins font-semibold transition
                     ${
                       blog.published
@@ -304,7 +348,7 @@ export default function AdminBlogsPage() {
                         : "bg-gray-500 text-white hover:bg-gray-400"
                     }`}
                 >
-                  {toggleLoadingIds.has(blog._id) ? (
+                  {toggleLoadingIds.has(blog.id) ? (
                     <div className="flex justify-center">
                       <Spinner tiny />
                     </div>
@@ -320,7 +364,6 @@ export default function AdminBlogsPage() {
         </div>
       )}
 
-      {/* Modal */}
       {popupOpen && (
         <>
           <button
@@ -378,7 +421,6 @@ function Spinner({ tiny = false }: { tiny?: boolean }) {
   );
 }
 
-/* Inline icons — no extra dependencies */
 function IconStarOutline({ className = "" }: { className?: string }) {
   return (
     <svg

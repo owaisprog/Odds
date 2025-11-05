@@ -41,19 +41,36 @@ export default function AdminAddBlogPage() {
     setIsClient(true);
   }, []);
 
-  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleThumbnailChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): Promise<void> => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true);
+    setIsLoading(true);
 
-    // Revoke previous preview to avoid memory leaks
-    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append(
+        "upload_preset",
+        process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET as string
+      );
 
-    const url = URL.createObjectURL(file);
-    setImagePreview(url);
-    setValue("thumbnail", url);
-    setUploading(false);
-    toast.success("Image selected!");
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME as string;
+      const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+
+      const response = await axios.post(uploadUrl, formData);
+
+      // Update form + show preview
+      setValue("thumbnail", response.data.secure_url);
+      setImagePreview(response.data.secure_url);
+      toast.success("Image uploaded successfully!");
+    } catch (err) {
+      console.error("Cloudinary upload error:", err);
+      toast.error("Image upload failed");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Add new category option inline

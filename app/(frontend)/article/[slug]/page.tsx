@@ -68,7 +68,7 @@ export default async function ArticlePage({ params }: PageProps) {
         <img
           src={article.thumbnail || "/placeholder.svg"}
           alt={article.title}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute border inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 px-6 md:px-10 pb-6">

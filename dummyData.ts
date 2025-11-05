@@ -508,20 +508,19 @@ export type BlogArticle = {
   publishedAt: string; // ISO date
   isFeatured?: boolean;
   published: boolean;
-  content: ContentBlock[]; // NEW
+  content: ContentBlock[];
 };
 
-// ---------- Data ----------
 export const blogArticles: BlogArticle[] = [
+  // NFL
   {
     _id: "a-nfl-1",
     slug: "why-the-49ers-are-undervalued-this-week",
     title: "Why the 49ers Are Undervalued This Week",
     description:
       "San Francisco could exploit a key matchup advantage on early downs. We break down the numbers and how to play it.",
-    // was: /images/blog/nfl-49ers.jpg
     thumbnail:
-      "https://images.pexels.com/photos/32911056/pexels-photo-32911056.jpeg?cs=srgb&dl=pexels-haberdoedas-32911056.jpg&fm=jpg",
+      "https://images.pexels.com/photos/32911056/pexels-photo-32911056.jpeg?auto=compress&cs=tinysrgb&w=1200",
     categories: [
       { name: "NFL", slug: "nfl" },
       { name: "Analysis", slug: "analysis" },
@@ -536,11 +535,23 @@ export const blogArticles: BlogArticle[] = [
         content:
           "The 49ers’ early-down run efficiency creates favorable second-and-short situations that limit obvious passing downs.",
       },
+      {
+        type: "image",
+        content:
+          "https://images.pexels.com/photos/1618200/pexels-photo-1618200.jpeg?auto=compress&cs=tinysrgb&w=1600",
+        description: "Inside zone rep — clean second-level access.",
+      },
       { type: "subheading", content: "Trenches & Scheme" },
       {
         type: "text",
         content:
           "Outside zone with split-flow looks stress the second level; expect motion to force linebackers to declare.",
+      },
+      {
+        type: "image",
+        content:
+          "https://images.pexels.com/photos/1618269/pexels-photo-1618269.jpeg?auto=compress&cs=tinysrgb&w=1600",
+        description: "Motion to widen the hook/curl defenders.",
       },
       {
         type: "text",
@@ -555,9 +566,8 @@ export const blogArticles: BlogArticle[] = [
     title: "Eagles vs Cowboys Primer: Odds & Picks",
     description:
       "Updated lines, matchup edges, and our favorite prop angles for the NFC clash.",
-    // was: /images/blog/nfl-eagles-cowboys.jpg
     thumbnail:
-      "https://images.pexels.com/photos/29424198/pexels-photo-29424198.jpeg?cs=srgb&dl=pexels-brunocortes1969-29424198.jpg&fm=jpg",
+      "https://images.pexels.com/photos/29424198/pexels-photo-29424198.jpeg?auto=compress&cs=tinysrgb&w=1200",
     categories: [
       { name: "NFL", slug: "nfl" },
       { name: "Picks", slug: "picks" },
@@ -571,6 +581,12 @@ export const blogArticles: BlogArticle[] = [
         type: "text",
         content:
           "Market opened near a field goal and tightened as injury reports favored the home front seven.",
+      },
+      {
+        type: "image",
+        content:
+          "https://images.pexels.com/photos/114296/pexels-photo-114296.jpeg?auto=compress&cs=tinysrgb&w=1600",
+        description: "Warmups on the sideline before kickoff.",
       },
       { type: "subheading", content: "Attack Surfaces" },
       {
@@ -593,9 +609,8 @@ export const blogArticles: BlogArticle[] = [
     title: "Best Bets for Lakers vs Nuggets",
     description:
       "Our model favors Denver on the glass and pace. Here’s how that translates into value on the spread and total.",
-    // was: /images/blog/nba-lakers-nuggets.jpg
     thumbnail:
-      "https://images.pexels.com/photos/30555514/pexels-photo-30555514.jpeg?cs=srgb&dl=pexels-rodolphe-asensi-1884149264-30555514.jpg&fm=jpg",
+      "https://images.pexels.com/photos/30555514/pexels-photo-30555514.jpeg?auto=compress&cs=tinysrgb&w=1200",
     categories: [
       { name: "NBA", slug: "nba" },
       { name: "Best Bets", slug: "best-bets" },
@@ -605,6 +620,12 @@ export const blogArticles: BlogArticle[] = [
     published: false,
     content: [
       { type: "heading", content: "Glass Advantage" },
+      {
+        type: "image",
+        content:
+          "https://images.pexels.com/photos/358042/pexels-photo-358042.jpeg?auto=compress&cs=tinysrgb&w=1600",
+        description: "Crash rate on the offensive glass matters here.",
+      },
       {
         type: "text",
         content:
@@ -644,6 +665,12 @@ export const blogArticles: BlogArticle[] = [
         content:
           "New York concedes pull-up midrange while walling off the rim; star guards settle for low-EV looks.",
       },
+      {
+        type: "image",
+        content:
+          "https://images.pexels.com/photos/159011/basketball-dunk-silhouette-sunset-159011.jpeg?auto=compress&cs=tinysrgb&w=1600",
+        description: "Drop big sitting at the level: keep everything in front.",
+      },
       { type: "subheading", content: "Rotation Tightening" },
       {
         type: "text",
@@ -660,9 +687,8 @@ export const blogArticles: BlogArticle[] = [
     title: "Betting on a Low-Scoring Affair in the SFC?",
     description:
       "Two top-10 defenses collide. We dig into pace, finishing drives, and red-zone rates.",
-    // was: /images/blog/ncaaf-low-scoring.jpg
     thumbnail:
-      "https://images.pexels.com/photos/15338952/pexels-photo-15338952.jpeg?cs=srgb&dl=pexels-timmossholder-15338952.jpg&fm=jpg",
+      "https://images.pexels.com/photos/15338952/pexels-photo-15338952.jpeg?auto=compress&cs=tinysrgb&w=1200",
     categories: [
       { name: "NCAAF", slug: "ncaaf" },
       { name: "Totals", slug: "totals" },
@@ -676,6 +702,12 @@ export const blogArticles: BlogArticle[] = [
         type: "text",
         content:
           "Both teams rank bottom-third in seconds per snap; fewer drives support a lower total.",
+      },
+      {
+        type: "image",
+        content:
+          "https://images.pexels.com/photos/1618261/pexels-photo-1618261.jpeg?auto=compress&cs=tinysrgb&w=1600",
+        description: "Field position battle shapes total outcomes.",
       },
       { type: "subheading", content: "Finishing Drives" },
       {
@@ -693,9 +725,8 @@ export const blogArticles: BlogArticle[] = [
     title: "Big Ten Clash: Live Dog on the Road",
     description:
       "Tempo edge and rim defense point to value on the visiting side.",
-    // was: /images/blog/ncaab-big-ten.jpg
     thumbnail:
-      "https://images.pexels.com/photos/32965264/pexels-photo-32965264.jpeg?cs=srgb&dl=pexels-bylukemiller-32965264.jpg&fm=jpg",
+      "https://images.pexels.com/photos/32965264/pexels-photo-32965264.jpeg?auto=compress&cs=tinysrgb&w=1200",
     categories: [
       { name: "NCAAB", slug: "ncaab" },
       { name: "Underdogs", slug: "underdogs" },
@@ -709,6 +740,12 @@ export const blogArticles: BlogArticle[] = [
         type: "text",
         content:
           "Superior rim deterrence and defensive rebounding keep games within one or two possessions late.",
+      },
+      {
+        type: "image",
+        content:
+          "https://images.pexels.com/photos/1752757/pexels-photo-1752757.jpeg?auto=compress&cs=tinysrgb&w=1600",
+        description: "Contest without fouling: the visiting blueprint.",
       },
       { type: "subheading", content: "Half-Court Offense" },
       {
@@ -726,9 +763,8 @@ export const blogArticles: BlogArticle[] = [
     title: "Strikeout Props to Target on Tuesday",
     description:
       "Pitcher whiff rates and opponent chase profiles highlight two plus-EV K props.",
-    // was: /images/blog/mlb-strikeouts.jpg
     thumbnail:
-      "https://images.pexels.com/photos/17724027/pexels-photo-17724027.jpeg?cs=srgb&dl=pexels-israwmx-17724027.jpg&fm=jpg",
+      "https://images.pexels.com/photos/17724027/pexels-photo-17724027.jpeg?auto=compress&cs=tinysrgb&w=1200",
     categories: [
       { name: "MLB", slug: "mlb" },
       { name: "Props", slug: "props" },
@@ -742,6 +778,12 @@ export const blogArticles: BlogArticle[] = [
         type: "text",
         content:
           "High CSW% sliders vs. elevated chase rates create pathways to 7+ Ks at modest pitch counts.",
+      },
+      {
+        type: "image",
+        content:
+          "https://images.pexels.com/photos/311040/pexels-photo-311040.jpeg?auto=compress&cs=tinysrgb&w=1600",
+        description: "Glove-side slider tunneling off four-seam.",
       },
       { type: "subheading", content: "Opposition Swing Paths" },
       {
@@ -759,9 +801,8 @@ export const blogArticles: BlogArticle[] = [
     title: "Co-Main Event: Stylistic Breakdown",
     description:
       "Southpaw countering vs. wrestle-heavy pressure — who dictates terms in the pocket?",
-    // was: /images/blog/ufc-co-main.jpg
     thumbnail:
-      "https://images.pexels.com/photos/28560745/pexels-photo-28560745.jpeg?cs=srgb&dl=pexels-byb-byb-412101727-28560745.jpg&fm=jpg",
+      "https://images.pexels.com/photos/28560745/pexels-photo-28560745.jpeg?auto=compress&cs=tinysrgb&w=1200",
     categories: [
       { name: "UFC", slug: "ufc" },
       { name: "Breakdown", slug: "breakdown" },
@@ -775,6 +816,12 @@ export const blogArticles: BlogArticle[] = [
         type: "text",
         content:
           "Southpaw counters punish squared entries; level changes must be disguised behind feints.",
+      },
+      {
+        type: "image",
+        content:
+          "https://images.pexels.com/photos/4761797/pexels-photo-4761797.jpeg?auto=compress&cs=tinysrgb&w=1600",
+        description: "Counter-left timing the step-in jab.",
       },
       { type: "subheading", content: "Cardio & Minute-Winning" },
       {
@@ -804,6 +851,12 @@ export const blogArticles: BlogArticle[] = [
         type: "text",
         content:
           "Durability plus attritional offense (low output, high accuracy) can flip rounds late.",
+      },
+      {
+        type: "image",
+        content:
+          "https://images.pexels.com/photos/4761663/pexels-photo-4761663.jpeg?auto=compress&cs=tinysrgb&w=1600",
+        description: "Octagon control and cage wrestling exchanges.",
       },
       { type: "subheading", content: "Paths to Upsets" },
       {

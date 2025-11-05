@@ -3,41 +3,120 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-const navLinks = [
-  { href: "/article", label: "Articles" },
-  { href: "/league", label: "Leagues" },
-  { href: "/prediction", label: "Predictions" },
+const leagues = [
+  { href: "/league/nfl", label: "NFL" },
+  { href: "/league/nba", label: "NBA" },
+  { href: "/league/ncaaf", label: "NCAAF" },
+  { href: "/league/ncaab", label: "NCAAB" },
+  { href: "/league/mlb", label: "MLB" },
+  { href: "/league/ufc", label: "UFC" },
 ];
 
 function NavBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [leagueDropdownOpen, setLeagueDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Handle search logic here
+      console.log("Searching for:", searchQuery);
+    }
+  };
 
   return (
-    <nav className="w-full bg-white border-b border-gray-100 sticky top-0 z-50 font-inter">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+    <nav className="w-full bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm font-inter">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between h-20 ">
           {/* Logo */}
-          <Link href={"/"}>
-            <Image src={"/WebLogo.png"} width={150} height={150} alt="ok" />
+          <Link href="/" className="flex-shrink-0">
+            <Image src="/WebLogo.png" width={150} height={150} alt="Logo" />
           </Link>
+
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-12">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-gray-700 font-medium text-base hover:text-[#278394] transition-colors duration-300 relative group"
-              >
-                {link.label}
+          <div className="hidden lg:flex items-center ">
+            {/* Home Link */}
+            <Link
+              href="/"
+              className="text-[#111827] font-medium text-base hover:text-[#278394] transition-colors duration-300 relative group"
+            >
+              Home
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#278394] transition-all duration-300 group-hover:w-full"></span>
+            </Link>
+
+            {/* League Dropdown */}
+            <div
+              className="relative  py-5 px-10"
+              onMouseEnter={() => setLeagueDropdownOpen(true)}
+              onMouseLeave={() => setLeagueDropdownOpen(false)}
+            >
+              <button className="flex items-center gap-2 text-[#111827] font-medium text-base hover:text-[#278394] transition-colors duration-300 relative group">
+                League
+                <svg
+                  className={`w-4 h-4 transition-transform duration-300 ${
+                    leagueDropdownOpen ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#278394] transition-all duration-300 group-hover:w-full"></span>
-              </a>
-            ))}
+              </button>
+
+              {/* Dropdown Menu */}
+              {leagueDropdownOpen && (
+                <div className="absolute  top-full left-0  w-48 bg-white border border-gray-500 rounded-lg shadow-lg overflow-hidden">
+                  {leagues.map((league) => (
+                    <Link
+                      key={league.href}
+                      href={league.href}
+                      className="block  px-4 py-3 text-[#111827] font-medium hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
+                    >
+                      {league.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-64 px-4 py-2 pl-10 text-[#111827] bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#278394] focus:border-transparent transition-all duration-300"
+              />
+              <svg
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </form>
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-gray-700 hover:text-gray-900"
+            className="lg:hidden p-2 text-[#111827] hover:text-[#278394]"
+            aria-label="Toggle menu"
           >
             <svg
               className="w-6 h-6"
@@ -66,16 +145,80 @@ function NavBar() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-100 py-4">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
+          <div className="lg:hidden border-t border-gray-100 py-4 space-y-2">
+            {/* Mobile Search */}
+            <form onSubmit={handleSearch} className="px-4 pb-3">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-4 py-2 pl-10 text-[#111827] bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#278394] focus:border-transparent"
+                />
+                <svg
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+            </form>
+
+            {/* Mobile Home */}
+            <Link
+              href="/"
+              className="block px-4 py-3 text-[#111827] font-medium hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
+            >
+              Home
+            </Link>
+
+            {/* Mobile League Dropdown */}
+            <div>
+              <button
+                onClick={() => setLeagueDropdownOpen(!leagueDropdownOpen)}
+                className="w-full flex items-center justify-between px-4 py-3 text-[#111827] font-medium hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
               >
-                {link.label}
-              </a>
-            ))}
+                <span>League</span>
+                <svg
+                  className={`w-4 h-4 transition-transform duration-300 ${
+                    leagueDropdownOpen ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+
+              {/* Mobile League Items */}
+              {leagueDropdownOpen && (
+                <div className="bg-gray-50">
+                  {leagues.map((league) => (
+                    <Link
+                      key={league.href}
+                      href={league.href}
+                      className="block pl-8 pr-4 py-3 text-[#111827] font-medium hover:bg-gray-100 hover:text-[#278394] transition-colors duration-200"
+                    >
+                      {league.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
