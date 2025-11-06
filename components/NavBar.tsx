@@ -1,67 +1,62 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 
 const LeagueLogos = {
   NFL: () => (
     <Image
-      src="/nfl.svg" // <- file lives in /public/nfl.svg
+      src="/nfl.svg"
       alt="NFL"
       width={30}
       height={30}
       className="w-7 h-7"
-      priority={false}
     />
   ),
   NBA: () => (
     <Image
-      src="/nba-6.svg" // <- file lives in /public/nfl.svg
-      alt="NFL"
+      src="/nba-6.svg"
+      alt="NBA"
       width={30}
       height={30}
       className="w-7 h-7"
-      priority={false}
     />
   ),
   NCAAF: () => (
     <Image
-      src="/ncaaf.svg" // <- file lives in /public/nfl.svg
-      alt="NFL"
+      src="/ncaaf.svg"
+      alt="NCAAF"
       width={30}
       height={30}
       className="w-7 h-7"
-      priority={false}
     />
   ),
   NCAAB: () => (
     <Image
-      src="/ncaa-1.svg" // <- file lives in /public/nfl.svg
-      alt="NFL"
+      src="/ncaa-1.svg"
+      alt="NCAAB"
       width={30}
       height={30}
       className="w-7 h-7"
-      priority={false}
     />
   ),
   MLB: () => (
     <Image
-      src="/mlb-1.svg" // <- file lives in /public/nfl.svg
-      alt="NFL"
+      src="/mlb-1.svg"
+      alt="MLB"
       width={30}
       height={30}
       className="w-7 h-7"
-      priority={false}
     />
   ),
   UFC: () => (
     <Image
-      src="/ufc.png" // <- file lives in /public/nfl.svg
-      alt="NFL"
+      src="/ufc.png"
+      alt="UFC"
       width={30}
       height={30}
       className="w-7 h-7"
-      priority={false}
     />
   ),
 };
@@ -77,13 +72,50 @@ const leagues = [
 
 function NavBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [leagueDropdownOpen, setLeagueDropdownOpen] = useState(false);
+  const [deskLeagueOpen, setDeskLeagueOpen] = useState(false);
+  const [mobileLeagueOpen, setMobileLeagueOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Only enable hover-open on devices that actually support hover (mouse)
+  const [supportsHover, setSupportsHover] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const update = () => setSupportsHover(mql.matches);
+    update();
+    mql.addEventListener?.("change", update);
+    // @ts-ignore - Safari fallback
+    mql.addListener?.(update);
+    return () => {
+      mql.removeEventListener?.("change", update);
+      // @ts-ignore - Safari fallback
+      mql.removeListener?.(update);
+    };
+  }, []);
+
+  // Desktop dropdown: close on outside click/tap
+  const leagueRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const onOutside = (e: MouseEvent | TouchEvent) => {
+      if (leagueRef.current && !leagueRef.current.contains(e.target as Node)) {
+        setDeskLeagueOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onOutside);
+    document.addEventListener("touchstart", onOutside);
+    return () => {
+      document.removeEventListener("mousedown", onOutside);
+      document.removeEventListener("touchstart", onOutside);
+    };
+  }, []);
+
+  // When closing mobile menu, also collapse its league section
+  useEffect(() => {
+    if (!mobileMenuOpen) setMobileLeagueOpen(false);
+  }, [mobileMenuOpen]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Handle search logic here
       console.log("Searching for:", searchQuery);
     }
   };
@@ -93,8 +125,8 @@ function NavBar() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
-            <Image src="/WebLogo.png" width={150} height={150} alt="Logo" />
+          <Link href="/" className="shrink-0">
+            <Image src="/WebLogo.png" width={160} height={160} alt="Logo" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -105,44 +137,55 @@ function NavBar() {
               className="text-[#111827] font-medium text-base hover:text-[#278394] transition-colors duration-300 relative group"
             >
               Home
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#278394] transition-all duration-300 group-hover:w-full"></span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#278394] transition-all duration-300 group-hover:w-full" />
             </Link>
 
-            {/* League Dropdown */}
+            {/* League Dropdown (desktop) */}
             <div
+              ref={leagueRef}
               className="relative py-5 px-10"
-              onMouseEnter={() => setLeagueDropdownOpen(true)}
-              onMouseLeave={() => setLeagueDropdownOpen(false)}
+              onMouseEnter={
+                supportsHover ? () => setDeskLeagueOpen(true) : undefined
+              }
+              onMouseLeave={
+                supportsHover ? () => setDeskLeagueOpen(false) : undefined
+              }
             >
-              <button className="flex items-center gap-2 text-[#111827] font-medium text-base hover:text-[#278394] transition-colors duration-300 relative group">
+              <button
+                type="button"
+                aria-haspopup="menu"
+                aria-expanded={deskLeagueOpen}
+                onClick={() => setDeskLeagueOpen((v) => !v)} // click/tap toggle for touch/laptop
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setDeskLeagueOpen((v) => !v);
+                  }
+                }}
+                className="flex items-center gap-2 text-[#111827] font-medium text-base hover:text-[#278394] transition-colors duration-300 relative group"
+              >
                 League
-                <svg
-                  className={`w-4 h-4 transition-transform duration-300 ${
-                    leagueDropdownOpen ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#278394] transition-all duration-300 group-hover:w-full"></span>
+                {deskLeagueOpen ? (
+                  <FiChevronUp className="w-4 h-4" />
+                ) : (
+                  <FiChevronDown className="w-4 h-4" />
+                )}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#278394] transition-all duration-300 group-hover:w-full" />
               </button>
 
-              {/* Dropdown Menu */}
-              {leagueDropdownOpen && (
-                <div className="absolute top-full left-0 w-52 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+              {deskLeagueOpen && (
+                <div
+                  role="menu"
+                  className="absolute top-full left-0 w-52 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
+                >
                   {leagues.map((league) => {
                     const LogoComponent = league.logo;
                     return (
                       <Link
                         key={league.href}
                         href={league.href}
+                        role="menuitem"
+                        onClick={() => setDeskLeagueOpen(false)} // close after click
                         className="flex items-center gap-3 px-4 py-3 text-[#111827] font-medium hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
                       >
                         <LogoComponent />
@@ -181,7 +224,7 @@ function NavBar() {
 
           {/* Mobile Menu Button */}
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={() => setMobileMenuOpen((v) => !v)}
             className="lg:hidden p-2 text-[#111827] hover:text-[#278394]"
             aria-label="Toggle menu"
           >
@@ -224,7 +267,7 @@ function NavBar() {
                   className="w-full px-4 py-2 pl-10 text-[#111827] bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#278394] focus:border-transparent"
                 />
                 <svg
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -242,6 +285,7 @@ function NavBar() {
             {/* Mobile Home */}
             <Link
               href="/"
+              onClick={() => setMobileMenuOpen(false)}
               className="block px-4 py-3 text-[#111827] font-medium hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
             >
               Home
@@ -250,29 +294,19 @@ function NavBar() {
             {/* Mobile League Dropdown */}
             <div>
               <button
-                onClick={() => setLeagueDropdownOpen(!leagueDropdownOpen)}
+                onClick={() => setMobileLeagueOpen((v) => !v)}
+                aria-expanded={mobileLeagueOpen}
                 className="w-full flex items-center justify-between px-4 py-3 text-[#111827] font-medium hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
               >
                 <span>League</span>
-                <svg
-                  className={`w-4 h-4 transition-transform duration-300 ${
-                    leagueDropdownOpen ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+                {mobileLeagueOpen ? (
+                  <FiChevronUp className="w-4 h-4" />
+                ) : (
+                  <FiChevronDown className="w-4 h-4" />
+                )}
               </button>
 
-              {/* Mobile League Items */}
-              {leagueDropdownOpen && (
+              {mobileLeagueOpen && (
                 <div className="bg-gray-50">
                   {leagues.map((league) => {
                     const LogoComponent = league.logo;
@@ -280,6 +314,10 @@ function NavBar() {
                       <Link
                         key={league.href}
                         href={league.href}
+                        onClick={() => {
+                          setMobileLeagueOpen(false);
+                          setMobileMenuOpen(false);
+                        }}
                         className="flex items-center gap-3 pl-8 pr-4 py-3 text-[#111827] font-medium hover:bg-gray-100 hover:text-[#278394] transition-colors duration-200"
                       >
                         <LogoComponent />
