@@ -117,17 +117,29 @@ export default function AdminBlogsPage() {
       return s;
     });
 
-  const togglePublished = (id: number) => {
+  const togglePublished = async (id: number) => {
     withSet(setToggleLoadingIds, id, true);
-    setTimeout(() => {
+    try {
+      const res = await fetch(`/api/togglePublished/${id}`, { method: "PUT" });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error || "Failed to update published status.");
+      }
+
+      const updated: { id: number; published: boolean } = await res.json();
       setBlogs((prev) =>
-        prev.map((b) => (b.id === id ? { ...b, published: !b.published } : b))
+        prev.map((b) =>
+          b.id === updated.id ? { ...b, published: updated.published } : b
+        )
       );
+    } catch (err: any) {
+      alert(err?.message || "Failed to update published status.");
+    } finally {
       withSet(setToggleLoadingIds, id, false);
-    }, 300);
+    }
   };
 
-  // replace this function in Code A
   const toggleFeatured = async (id: number) => {
     withSet(setFeaturedLoadingIds, id, true);
     try {

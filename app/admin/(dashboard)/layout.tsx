@@ -7,20 +7,11 @@ export default function AdminDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // 🔐 Simple auth gate (replace with your real check)
-  // e.g., a cookie set during login: "admin_session"
-  //   const session = cookies().get("admin_session")?.value;
-  //   if (!session) {
-  //     redirect("/admin/login");
-  //   }
-
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    // ⬇️ stack on mobile, row from md+
+    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
       <AdminSidebar />
-      <main className="flex-1 min-w-0">
-        {/* optional top padding if you add a header here */}
-        {children}
-      </main>
+      <main className="flex-1 min-w-0">{children}</main>
     </div>
   );
 }

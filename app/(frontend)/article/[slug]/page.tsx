@@ -346,7 +346,7 @@ export default function ArticlePage() {
             <div className="relative z-10 h-full flex items-end ">
               <div className="container mx-auto px-8 pb-16 md:pb-22">
                 {/* Article Preview */}
-                <div className="text-white max-w-3xl border border-red-400">
+                <div className="text-white max-w-3xl ">
                   <span
                     className="inline-block px-3 py-1 rounded-md text-sm mb-4"
                     style={{ backgroundColor: "#25818F" }}

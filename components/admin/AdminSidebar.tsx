@@ -58,7 +58,7 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Top bar (mobile only) */}
-      <div className="md:hidden sticky top-0 z-40 bg-black/95 backdrop-blur border-b border-gray-800">
+      <div className="md:hidden sticky top-0 z-40 bg-black/95 backdrop-blur border-b border-gray-800 flex-none w-full">
         <div className="flex items-center justify-between px-5 py-4">
           <button
             aria-label="Open menu"

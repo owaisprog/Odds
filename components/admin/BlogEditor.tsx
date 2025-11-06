@@ -65,27 +65,60 @@ export default function BlogEditor({
     setImageLoading(false);
   };
 
-  // Local image select (no upload). Creates a blob URL for preview.
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // ========= CHANGED: Upload image to Cloudinary using env vars =========
+  const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? "";
+  const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ?? "";
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setImageLoading(true);
     const file = e.target.files?.[0];
+
     if (!file) {
       setImageLoading(false);
       return;
     }
 
-    // revoke previous preview if it was a blob
+    // revoke previous preview if it was a blob (cleanup, if any existed)
     if (inputValue.startsWith("blob:")) {
       try {
         URL.revokeObjectURL(inputValue);
+        createdBlobUrlsRef.current.delete(inputValue);
       } catch {}
     }
 
-    const url = URL.createObjectURL(file);
-    createdBlobUrlsRef.current.add(url);
-    setInputValue(url);
-    setImageLoading(false);
+    if (!CLOUD_NAME || !UPLOAD_PRESET) {
+      console.error(
+        "Cloudinary env vars missing: NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME or NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET"
+      );
+      setImageLoading(false);
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", UPLOAD_PRESET);
+
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        { method: "POST", body: formData }
+      );
+
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "");
+        throw new Error(`Cloudinary upload failed: ${res.status} ${errText}`);
+      }
+
+      const data = await res.json();
+      // Use the hosted URL for preview and saving
+      setInputValue(data.secure_url);
+    } catch (err) {
+      console.error("Upload failed:", err);
+    } finally {
+      setImageLoading(false);
+    }
   };
+  // ========= END CHANGED SECTION =========
 
   const handleSubmitBlock = async () => {
     if (!currentType || !inputValue.trim()) return;
@@ -244,7 +277,7 @@ export default function BlogEditor({
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      onChange={handleImageSelect}
+                      onChange={handleImageUpload}
                     />
 
                     {inputValue && (
