@@ -1,8 +1,7 @@
 // app/api/v1/article/[slug]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
 
 interface RouteParams {
   params: Promise<{

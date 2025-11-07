@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { upcomingGames } from "@/dummyData";
 import type { UpcomingGame } from "@/dummyData";
 
@@ -34,8 +34,24 @@ export default function UpcomingGames() {
   const [selectedLeague, setSelectedLeague] = useState<
     "NFL" | "NBA" | "NCAAF" | "NCAAB" | "MLB" | "UFC"
   >("NFL");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const leagueTabs = ["NFL", "NBA", "NCAAF", "NCAAB", "MLB", "UFC"];
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Update periodically so games drop off at kickoff.
   const [nowTimestamp, setNowTimestamp] = useState(() => Date.now());
@@ -65,6 +81,11 @@ export default function UpcomingGames() {
     return withinWindow.slice(0, 6);
   }, [selectedLeague, nowTimestamp]);
 
+  const handleLeagueSelect = (league: typeof selectedLeague) => {
+    setSelectedLeague(league);
+    setIsDropdownOpen(false);
+  };
+
   return (
     <section className="w-full bg-white py-16 sm:py-20">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
@@ -88,28 +109,57 @@ export default function UpcomingGames() {
           </Link>
         </div>
 
-        {/* League Tabs */}
+        {/* League Dropdown */}
         <div className="mb-8 sm:mb-10">
-          <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {leagueTabs.map((league) => {
-              const isActive = selectedLeague === league;
-              return (
-                <button
-                  key={league}
-                  onClick={() =>
-                    setSelectedLeague(league as typeof selectedLeague)
-                  }
-                  className={[
-                    "px-5 sm:px-6 py-2.5 rounded-full text-sm sm:text-base font-semibold whitespace-nowrap transition-all",
-                    isActive
-                      ? "bg-[#24257C] text-white shadow-sm"
-                      : "bg-white text-gray-700 border cursor-pointer border-gray-200 hover:border-[#24257C] hover:text-[#24257C]",
-                  ].join(" ")}
-                >
-                  {league}
-                </button>
-              );
-            })}
+          <div
+            className="relative inline-block w-full sm:w-auto"
+            ref={dropdownRef}
+          >
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="w-full sm:w-94 cursor-pointer flex items-center justify-between px-5 py-3 bg-white border-2 border-gray-200 rounded-lg text-[#111827] font-semibold text-base  transition-colors focus:outline-none focus:ring-2 focus:ring-[#24257C] focus:ring-offset-2"
+            >
+              <span>{selectedLeague}</span>
+              <svg
+                className={`w-5 h-5 transition-transform ${
+                  isDropdownOpen ? "rotate-180" : ""
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div className="absolute z-50 w-full sm:w-94 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                {leagueTabs.map((league) => {
+                  const isActive = selectedLeague === league;
+                  return (
+                    <button
+                      key={league}
+                      onClick={() =>
+                        handleLeagueSelect(league as typeof selectedLeague)
+                      }
+                      className={`w-full px-5 py-3 cursor-pointer text-left text-base font-semibold transition-colors ${
+                        isActive
+                          ? "bg-[#24257C] text-white"
+                          : "text-[#111827] hover:bg-gray-50"
+                      }`}
+                    >
+                      {league}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* View All (mobile) */}

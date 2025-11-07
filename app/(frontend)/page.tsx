@@ -1,10 +1,39 @@
 import HomeHero from "@/components/Home/HomeHero";
 import UpcomingGames from "@/components/Home/UpcomingGames";
+import { prisma } from "@/lib/prisma"; // see singleton below
 
-export default function Home() {
+export default async function Home() {
+  const articles = await prisma.article.findMany({
+    where: { isFeatured: true, published: true }, // only published featured
+    orderBy: { publishedAt: "desc" },
+    take: 3,
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      description: true,
+      thumbnail: true,
+      publishedAt: true,
+      isFeatured: true,
+      published: true,
+      categories: { select: { name: true, slug: true } },
+    },
+  });
+
+  const initialFeatured = articles.map((a) => ({
+    id: a.id,
+    slug: a.slug,
+    title: a.title,
+    description: a.description,
+    thumbnail: a.thumbnail,
+    publishedAt: a.publishedAt.toISOString(),
+    isFeatured: !!a.isFeatured,
+    published: !!a.published,
+    categories: a.categories,
+  }));
   return (
     <main>
-      <HomeHero />
+      <HomeHero initialFeatured={initialFeatured} />
 
       <UpcomingGames />
       <div className="h-20" />
