@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"; // see singleton below
 
 export default async function Home() {
   const articles = await prisma.article.findMany({
-    where: { isFeatured: true, published: true }, // only published featured
+    where: { isFeatured: true }, // only published featured
     orderBy: { publishedAt: "desc" },
     take: 3,
     select: {

@@ -23,11 +23,6 @@ const NAV_ITEMS: NavItem[] = [
     icon: <MdArticle className="w-6 h-6" />,
   },
   {
-    href: "/admin/categories",
-    label: "Categories",
-    icon: <MdCategory className="w-6 h-6" />,
-  },
-  {
     href: "/admin/addBlogs",
     label: "Add Blog",
     icon: <MdAdd className="w-6 h-6" />,
