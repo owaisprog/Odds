@@ -1,3 +1,4 @@
+// components/Home/UpcomingGames.tsx
 "use client";
 
 import Link from "next/link";
@@ -5,7 +6,6 @@ import Image from "next/image";
 import { useMemo, useState, useEffect, useRef } from "react";
 import { upcomingGames } from "@/dummyData";
 import type { UpcomingGame } from "@/dummyData";
-import { useSearch } from "@/components/providers/SearchProvider";
 
 /** Parse a kickoff timestamp (ms) from game fields. */
 function getKickoffTimestampFromGame(game: UpcomingGame): number {
@@ -99,13 +99,14 @@ const leagues = [
 ] as const;
 
 export default function UpcomingGames() {
-  const { query } = useSearch();
-
   const [selectedLeague, setSelectedLeague] = useState<
     "NFL" | "NBA" | "NCAAF" | "NCAAB" | "MLB" | "UFC"
   >("NFL");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // local search query (filters live)
+  const [query, setQuery] = useState("");
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -146,7 +147,7 @@ export default function UpcomingGames() {
       isWithinNextSevenDays(getKickoffTimestampFromGame(g), nowTimestamp)
     );
 
-    // Live search (from NavBar)
+    // Live search (local to this component)
     const q = query.trim().toLowerCase();
     const searched = !q
       ? withinWindow
@@ -176,8 +177,9 @@ export default function UpcomingGames() {
   return (
     <section id="upcoming" className="w-full bg-white py-16 sm:py-20">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8 sm:mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        {/* Header (responsive grid) */}
+        <div className="mb-8 sm:mb-12 grid gap-4 sm:gap-6 md:grid-cols-[1fr_auto_auto] md:items-end">
+          {/* Title/desc */}
           <div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight font-playfair">
               Upcoming Games
@@ -187,10 +189,39 @@ export default function UpcomingGames() {
             </p>
           </div>
 
-          {/* View All (desktop) */}
+          {/* Search (full width on <md, fixed width on md+) */}
+          <form
+            onSubmit={(e) => e.preventDefault()}
+            className="relative order-last md:order-0 w-full md:w-auto justify-self-stretch md:justify-self-center"
+            aria-label="Search upcoming games"
+          >
+            <input
+              type="text"
+              placeholder="Search games, teams..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full md:w-72 px-4 py-2 pl-10 text-[#111827] bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#278394] focus:border-transparent transition-all duration-300"
+            />
+            <svg
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </form>
+
+          {/* View All (desktop only, right aligned) */}
           <Link
             href={`/league/${selectedLeague.toLowerCase()}`}
-            className="hidden md:inline-flex items-center cursor-pointer justify-center h-10 px-5 rounded-lg bg-[#24257C] text-white text-sm font-semibold hover:bg-[#C83495] transition"
+            className="hidden md:inline-flex justify-self-start md:justify-self-end items-center cursor-pointer h-10 px-5 rounded-lg bg-[#24257C] text-white text-sm font-semibold hover:bg-[#C83495] transition"
           >
             View All
           </Link>
@@ -198,14 +229,11 @@ export default function UpcomingGames() {
 
         {/* League Dropdown */}
         <div className="mb-8 sm:mb-10">
-          <div
-            className="relative inline-block w-full sm:w-auto"
-            ref={dropdownRef}
-          >
+          <div className="relative inline-block w-full" ref={dropdownRef}>
             {/* Toggle button shows current league + logo */}
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="w-full sm:w-94 cursor-pointer flex items-center justify-between px-5 py-3 bg-white border-2 border-gray-200 rounded-lg text-[#111827] font-semibold text-base transition-colors focus:outline-none focus:ring-2 focus:ring-[#24257C] focus:ring-offset-2"
+              className="w-full md:w-94 cursor-pointer flex items-center justify-between px-5 py-3 bg-white border-2 border-gray-200 rounded-lg text-[#111827] font-semibold text-base transition-colors focus:outline-none focus:ring-2 focus:ring-[#24257C] focus:ring-offset-2"
             >
               <span className="flex items-center gap-3">
                 <ActiveLogo />
@@ -301,6 +329,7 @@ export default function UpcomingGames() {
                   </div>
 
                   <div className="flex items-center justify-between gap-4 mb-5">
+                    {/* Away */}
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
                         {game.awayTeam.logo}
@@ -314,11 +343,15 @@ export default function UpcomingGames() {
                         </p>
                       </div>
                     </div>
+
+                    {/* VS */}
                     <div className="px-2">
                       <span className="text-sm font-semibold text-gray-400">
                         vs
                       </span>
                     </div>
+
+                    {/* Home */}
                     <div className="flex items-center gap-3 flex-1 min-w-0 justify-end">
                       <div className="min-w-0 text-right">
                         <p className="font-semibold text-[15px] text-[#111827] truncate">
@@ -332,6 +365,7 @@ export default function UpcomingGames() {
                     </div>
                   </div>
 
+                  {/* Odds block */}
                   <div className="rounded-xl bg-gray-50 border border-gray-100">
                     <div className="grid grid-cols-3 divide-x divide-gray-100">
                       <div className="p-3 text-center">

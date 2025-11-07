@@ -1,11 +1,10 @@
+// components/NavBar.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
-import { useSearch } from "@/components/providers/SearchProvider";
 
 const LeagueLogos = {
   NFL: () => (
@@ -74,32 +73,27 @@ const leagues = [
 ];
 
 function NavBar() {
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const { query, setQuery } = useSearch();
-
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [deskLeagueOpen, setDeskLeagueOpen] = useState(false);
   const [mobileLeagueOpen, setMobileLeagueOpen] = useState(false);
 
-  // hover support detection for desktops
+  // Only enable hover-open on devices that support hover (mouse)
   const [supportsHover, setSupportsHover] = useState(false);
   useEffect(() => {
     const mql = window.matchMedia("(hover: hover) and (pointer: fine)");
     const update = () => setSupportsHover(mql.matches);
     update();
     mql.addEventListener?.("change", update);
-    // @ts-ignore (Safari)
+    // @ts-ignore - Safari fallback
     mql.addListener?.(update);
     return () => {
       mql.removeEventListener?.("change", update);
-      // @ts-ignore
+      // @ts-ignore - Safari fallback
       mql.removeListener?.(update);
     };
   }, []);
 
-  // close desktop dropdown on outside click
+  // Desktop dropdown: close on outside click/tap
   const leagueRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const onOutside = (e: MouseEvent | TouchEvent) => {
@@ -115,33 +109,10 @@ function NavBar() {
     };
   }, []);
 
-  // collapse league when mobile menu closes
+  // When closing mobile menu, also collapse its league section
   useEffect(() => {
     if (!mobileMenuOpen) setMobileLeagueOpen(false);
   }, [mobileMenuOpen]);
-
-  // --- NEW: jump to "Upcoming" when the search input is focused/clicked ---
-  const desktopInputRef = useRef<HTMLInputElement>(null);
-  const mobileInputRef = useRef<HTMLInputElement>(null);
-
-  const jumpToUpcoming = (which?: "desktop" | "mobile") => {
-    if (pathname !== "/") {
-      // navigate to home and anchor to #upcoming
-      router.push("/#upcoming");
-      // try to keep focus on the same input after nav
-      const ref = which === "mobile" ? mobileInputRef : desktopInputRef;
-      setTimeout(() => ref.current?.focus(), 150);
-      return;
-    }
-    const el = document.getElementById("upcoming");
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // also ensure we’re at "Upcoming" on submit
-    jumpToUpcoming();
-  };
 
   return (
     <nav className="w-full bg-white border-b border-gray-200 sticky top-0 z-50 shadow-md font-inter">
@@ -154,7 +125,7 @@ function NavBar() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center">
-            {/* Home */}
+            {/* Home Link */}
             <Link
               href="/"
               className="text-[#111827] font-medium text-base hover:text-[#278394] transition-colors duration-300 relative group"
@@ -163,10 +134,10 @@ function NavBar() {
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#278394] transition-all duration-300 group-hover:w-full" />
             </Link>
 
-            {/* League Dropdown */}
+            {/* League Dropdown (desktop) */}
             <div
               ref={leagueRef}
-              className="relative py-5 px-10"
+              className="relative py-5 px-10 mr-5 "
               onMouseEnter={
                 supportsHover ? () => setDeskLeagueOpen(true) : undefined
               }
@@ -178,16 +149,16 @@ function NavBar() {
                 type="button"
                 aria-haspopup="menu"
                 aria-expanded={deskLeagueOpen}
-                onClick={() => setDeskLeagueOpen((v) => !v)}
+                onClick={() => setDeskLeagueOpen((v) => !v)} // click/tap toggle
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     setDeskLeagueOpen((v) => !v);
                   }
                 }}
-                className="flex items-center gap-2 text-[#111827] font-medium text-base hover:text-[#278394] transition-colors duration-300 relative group"
+                className="flex cursor-pointer items-center gap-2 text-[#111827] font-medium text-base hover:text-[#278394] transition-colors duration-300 relative group"
               >
-                League
+                Leagues
                 {deskLeagueOpen ? (
                   <FiChevronUp className="w-4 h-4" />
                 ) : (
@@ -202,16 +173,16 @@ function NavBar() {
                   className="absolute top-full left-0 w-52 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
                 >
                   {leagues.map((league) => {
-                    const Logo = league.logo;
+                    const LogoComponent = league.logo;
                     return (
                       <Link
                         key={league.href}
                         href={league.href}
                         role="menuitem"
-                        onClick={() => setDeskLeagueOpen(false)}
+                        onClick={() => setDeskLeagueOpen(false)} // close after click
                         className="flex items-center gap-3 px-4 py-3 text-[#111827] font-medium hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
                       >
-                        <Logo />
+                        <LogoComponent />
                         <span>{league.label}</span>
                       </Link>
                     );
@@ -219,33 +190,6 @@ function NavBar() {
                 </div>
               )}
             </div>
-
-            {/* Search Bar (desktop) */}
-            <form onSubmit={handleSearchSubmit} className="relative">
-              <input
-                ref={desktopInputRef}
-                type="text"
-                placeholder="Search games, teams..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onFocus={() => jumpToUpcoming("desktop")}
-                onClick={() => jumpToUpcoming("desktop")}
-                className="w-64 px-4 py-2 pl-10 text-[#111827] bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#278394] focus:border-transparent transition-all duration-300"
-              />
-              <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </form>
           </div>
 
           {/* Mobile Menu Button */}
@@ -282,35 +226,6 @@ function NavBar() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden border-t border-gray-100 py-4 space-y-2">
-            {/* Mobile Search */}
-            <form onSubmit={handleSearchSubmit} className="px-4 pb-3">
-              <div className="relative">
-                <input
-                  ref={mobileInputRef}
-                  type="text"
-                  placeholder="Search games, teams..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onFocus={() => jumpToUpcoming("mobile")}
-                  onClick={() => jumpToUpcoming("mobile")}
-                  className="w-full px-4 py-2 pl-10 text-[#111827] bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#278394] focus:border-transparent"
-                />
-                <svg
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
-            </form>
-
             {/* Mobile Home */}
             <Link
               href="/"
@@ -338,7 +253,7 @@ function NavBar() {
               {mobileLeagueOpen && (
                 <div className="bg-gray-50">
                   {leagues.map((league) => {
-                    const Logo = league.logo;
+                    const LogoComponent = league.logo;
                     return (
                       <Link
                         key={league.href}
@@ -349,7 +264,7 @@ function NavBar() {
                         }}
                         className="flex items-center gap-3 pl-8 pr-4 py-3 text-[#111827] font-medium hover:bg-gray-100 hover:text-[#278394] transition-colors duration-200"
                       >
-                        <Logo />
+                        <LogoComponent />
                         <span>{league.label}</span>
                       </Link>
                     );
