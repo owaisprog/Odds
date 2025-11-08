@@ -9,22 +9,19 @@ export default async function AdminDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // ⬇️ Next 16: cookies() returns a Promise<ReadonlyRequestCookies>
-  const cookieStore = await cookies();
-  const token = cookieStore.get(getAdminCookieName())?.value;
+  const store = await cookies();
+  const token = store.get(getAdminCookieName())?.value;
 
-  if (!token) {
-    redirect("/admin/login");
-  }
-
+  if (!token) redirect("/admin/login");
   try {
-    verifyAdminJWT(token); // throws if invalid/expired
+    verifyAdminJWT(token);
   } catch {
     redirect("/admin/login");
   }
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    // ⬇️ Stack on mobile, side-by-side from md up
+    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
       <AdminSidebar />
       <main className="flex-1 min-w-0">{children}</main>
     </div>

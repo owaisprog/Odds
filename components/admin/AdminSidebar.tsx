@@ -1,17 +1,10 @@
-// components/admin/AdminSidebar.tsx
 "use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
-import {
-  MdArticle,
-  MdCategory,
-  MdAdd,
-  MdMessage,
-  MdLogout,
-} from "react-icons/md";
+import { MdArticle, MdAdd, MdMessage, MdLogout } from "react-icons/md";
 import { RiDashboardFill } from "react-icons/ri";
 
 type NavItem = { href: string; label: string; icon: React.ReactNode };
@@ -36,12 +29,9 @@ const NAV_ITEMS: NavItem[] = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false); // mobile drawer
+  const [open, setOpen] = useState(false);
 
-  // Close the mobile drawer whenever route changes
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  useEffect(() => setOpen(false), [pathname]);
 
   const handleLogout = async () => {
     if (!confirm("Are you sure you want to logout?")) return;
@@ -51,9 +41,9 @@ export default function AdminSidebar() {
 
   return (
     <>
-      {/* Top bar (mobile only) */}
-      <div className="md:hidden sticky top-0 z-40 bg-black/95 backdrop-blur border-b border-gray-800 flex-none w-full">
-        <div className="flex items-center justify-between px-5 py-4">
+      {/* Mobile header (stays at top, doesn’t steal the whole layout) */}
+      <div className="md:hidden sticky top-0 z-40 h-16 bg-black/95 backdrop-blur border-b border-gray-800 w-full">
+        <div className="flex items-center justify-between px-5 h-full">
           <button
             aria-label="Open menu"
             onClick={() => setOpen(true)}
@@ -61,7 +51,7 @@ export default function AdminSidebar() {
           >
             <HiMenuAlt3 className="w-6 h-6 text-white" />
           </button>
-          <div className="text-xl font-playfair text-white font-semibold">
+          <div className="text-lg font-playfair text-white font-semibold">
             Admin
           </div>
           <div className="w-10" />
@@ -78,7 +68,6 @@ export default function AdminSidebar() {
       {/* Mobile drawer */}
       {open && (
         <div className="fixed inset-0 z-50 md:hidden">
-          {/* Backdrop */}
           <button
             aria-label="Close menu"
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
@@ -112,7 +101,7 @@ function Header() {
   return (
     <div className="px-6 py-7 border-b border-gray-800 bg-gradient-to-br from-gray-900 to-black">
       <div className="flex items-center gap-3 mb-2">
-        <div className="p-2.5  rounded-xl shadow-lg">
+        <div className="p-2.5 rounded-xl shadow-lg">
           <RiDashboardFill className="w-7 h-7 text-white" />
         </div>
         <h1 className="text-xl 2xl:text-3xl font-bold tracking-wide font-playfair text-white">
@@ -137,7 +126,7 @@ function Nav({ pathname }: { pathname: string }) {
             className={`group flex items-center gap-4 rounded-xl px-4 py-3.5 transition-all duration-200 relative overflow-hidden
               ${
                 active
-                  ? "bg-[#278394] text-white "
+                  ? "bg-[#278394] text-white"
                   : "text-gray-300 hover:bg-gray-800/50 hover:text-white"
               }`}
           >
@@ -148,11 +137,9 @@ function Nav({ pathname }: { pathname: string }) {
             >
               {icon}
             </span>
-            <span className="text-base xl:text-xl :font-medium font-poppins relative z-10">
+            <span className="text-base xl:text-xl font-poppins relative z-10">
               {label}
             </span>
-
-            {/* Active indicator */}
             {active && (
               <div className="ml-auto w-2 h-2 rounded-full bg-white animate-pulse" />
             )}
@@ -168,7 +155,7 @@ function Footer({ onLogout }: { onLogout: () => void }) {
     <div className="p-4 border-t border-gray-800 bg-black">
       <button
         onClick={onLogout}
-        className="group cursor-pointer w-full inline-flex items-center justify-center gap-3 rounded-xl bg-[#278394] px-4 py-3.5 text-base font-medium text-white font-poppins hover transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+        className="group cursor-pointer w-full inline-flex items-center justify-center gap-3 rounded-xl bg-[#278394] px-4 py-3.5 text-base font-medium text-white font-poppins transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
       >
         <MdLogout className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
         Logout
