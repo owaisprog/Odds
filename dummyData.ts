@@ -493,6 +493,7 @@ export type ContentBlock = {
 };
 
 export type BlogArticle = {
+ 
   slug: string;
   title: string;
   description: string;
