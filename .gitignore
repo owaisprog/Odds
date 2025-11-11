@@ -12,7 +12,7 @@
 
 # testing
 /coverage
-
+ok.tsx
 # next.js
 /.next/
 /out/

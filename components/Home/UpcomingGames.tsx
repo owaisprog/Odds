@@ -3,24 +3,39 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useMemo, useState, useEffect, useRef } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
+import { Gamepad } from "lucide-react";
 import { upcomingGames } from "@/dummyData";
 import type { UpcomingGame } from "@/dummyData";
+
+/** ---------- Team avatar: football icon only (no text logos) ---------- */
+function TeamAvatar({ name }: { name: string }) {
+  return (
+    <span className="text-[#24257C]" aria-label={`${name} logo`}>
+      <Gamepad className="w-7 h-7" />
+    </span>
+  );
+}
 
 /** Parse a kickoff timestamp (ms) from game fields. */
 function getKickoffTimestampFromGame(game: UpcomingGame): number {
   const maybeKickoffTs = (game as any)?.kickoffTs;
   if (typeof maybeKickoffTs === "number") return maybeKickoffTs;
 
-  // e.g. "Jan 5, 2025 1:00 PM ET"
-  const timePart =
-    game.kickoffTime?.match(/\b\d{1,2}:\d{2}\s?[AP]M\b/i)?.[0] ?? "";
-  const tzPart = game.kickoffTime?.match(/\b(ET|CT|MT|PT)\b/i)?.[0] ?? "";
+  const iso = (game as any)?.kickoffIso ?? (game as any)?.commence_time;
+  if (typeof iso === "string") {
+    const p = Date.parse(iso);
+    if (Number.isFinite(p)) return p;
+  }
 
+  const timePart =
+    (game as any).kickoffTime?.match(/\b\d{1,2}:\d{2}\s?[AP]M\b/i)?.[0] ?? "";
+  const tzPart =
+    (game as any).kickoffTime?.match(/\b(ET|CT|MT|PT)\b/i)?.[0] ?? "";
   const composed = timePart
-    ? `${game.date} ${timePart}${tzPart ? ` ${tzPart}` : ""}`
-    : game.date;
-  const parsed = Date.parse(composed);
+    ? `${(game as any).date} ${timePart}${tzPart ? ` ${tzPart}` : ""}`
+    : (game as any).date;
+  const parsed = Date.parse(composed as string);
   return Number.isFinite(parsed) ? parsed : NaN;
 }
 
@@ -31,7 +46,7 @@ function isWithinNextSevenDays(ts: number, nowMs: number) {
   return ts >= nowMs && ts <= nowMs + sevenDaysMs;
 }
 
-/* --------- Logos + leagues for dropdown --------- */
+/* --------- League logos for dropdown --------- */
 const LeagueLogos = {
   NFL: () => (
     <Image
@@ -97,6 +112,64 @@ const leagues = [
   { href: "/league/mlb", label: "MLB", logo: LeagueLogos.MLB },
   { href: "/league/ufc", label: "UFC", logo: LeagueLogos.UFC },
 ] as const;
+
+/* ---------- Odds formatting helpers ---------- */
+function signPoint(n?: number | null) {
+  if (typeof n !== "number" || Number.isNaN(n)) return "-";
+  return n > 0 ? `+${n}` : `${n}`;
+}
+function fmtAmerican(n?: number | null) {
+  if (typeof n !== "number" || Number.isNaN(n)) return "";
+  return n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`;
+}
+
+/** Spread */
+function extractSpreadPieces(game: UpcomingGame) {
+  const s: any = (game as any)?.odds?.spread;
+  if (s && typeof s === "object" && s.away && s.home) {
+    return {
+      awayPointText: signPoint(s.away.point),
+      awayPriceText: fmtAmerican(s.away.price) || "—",
+      homePointText: signPoint(s.home.point),
+      homePriceText: fmtAmerican(s.home.price) || "—",
+    };
+  }
+  return {
+    awayPointText: "-",
+    awayPriceText: "—",
+    homePointText: "-",
+    homePriceText: "—",
+  };
+}
+
+/** Total */
+function extractTotalPieces(game: UpcomingGame) {
+  const t: any = (game as any)?.odds?.total;
+  if (t && typeof t === "object") {
+    return {
+      pointText: typeof t.point === "number" ? `${t.point}` : "-",
+      overText: fmtAmerican(t.over) || "—",
+      underText: fmtAmerican(t.under) || "—",
+    };
+  }
+  return { pointText: "-", overText: "—", underText: "—" };
+}
+
+/** Moneyline */
+function extractMoneylinePieces(game: UpcomingGame) {
+  const ml: any = (game as any)?.odds?.moneyline;
+  if (ml && typeof ml === "object") {
+    return {
+      awayMl: fmtAmerican(ml.away) || "—",
+      homeMl: fmtAmerican(ml.home) || "—",
+    };
+  }
+  return { awayMl: "—", homeMl: "—" };
+}
+
+/** Consistent grid for the odds section so headers align exactly over data */
+const ODDS_GRID =
+  "grid grid-cols-[1fr_minmax(92px,auto)_minmax(92px,auto)_minmax(64px,auto)] items-center gap-3";
 
 export default function UpcomingGames() {
   const [selectedLeague, setSelectedLeague] = useState<
@@ -185,11 +258,11 @@ export default function UpcomingGames() {
               Upcoming Games
             </h2>
             <p className="mt-2 text-base sm:text-lg text-gray-600 font-inter">
-              Expert predictions and odds for today&apos;s matchups
+              Spread • Total • Moneyline for upcoming matchups
             </p>
           </div>
 
-          {/* Search (full width on <md, fixed width on md+) */}
+          {/* Search */}
           <form
             onSubmit={(e) => e.preventDefault()}
             className="relative order-last md:order-0 w-full md:w-auto justify-self-stretch md:justify-self-center"
@@ -218,7 +291,7 @@ export default function UpcomingGames() {
             </svg>
           </form>
 
-          {/* View All (desktop only, right aligned) */}
+          {/* View All (desktop) */}
           <Link
             href={`/league/${selectedLeague.toLowerCase()}`}
             className="hidden md:inline-flex justify-self-start md:justify-self-end items-center cursor-pointer h-10 px-5 rounded-lg bg-[#24257C] text-white text-sm font-semibold hover:bg-[#C83495] transition"
@@ -230,7 +303,6 @@ export default function UpcomingGames() {
         {/* League Dropdown */}
         <div className="mb-8 sm:mb-10">
           <div className="relative inline-block w-full" ref={dropdownRef}>
-            {/* Toggle button shows current league + logo */}
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="w-full md:w-94 cursor-pointer flex items-center justify-between px-5 py-3 bg-white border-2 border-gray-200 rounded-lg text-[#111827] font-semibold text-base transition-colors focus:outline-none focus:ring-2 focus:ring-[#24257C] focus:ring-offset-2"
@@ -256,7 +328,6 @@ export default function UpcomingGames() {
               </svg>
             </button>
 
-            {/* Dropdown Menu with logos + hover color */}
             {isDropdownOpen && (
               <div className="absolute z-50 w-full sm:w-94 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
                 {leagues.map((league) => {
@@ -305,12 +376,16 @@ export default function UpcomingGames() {
                   hour: "numeric",
                   minute: "2-digit",
                 })
-              : game.kickoffTime ?? "TBD";
+              : ((game as any).kickoffTime as string) ?? "TBD";
 
-            const oddsDisplaySpread = game.odds?.spread ?? "-";
-            const oddsDisplayTotal = game.odds?.total ?? "-";
-            const oddsDisplayMoneyline = game.odds?.moneyline ?? "-";
-
+            const {
+              awayPointText,
+              awayPriceText,
+              homePointText,
+              homePriceText,
+            } = extractSpreadPieces(game);
+            const { pointText, overText, underText } = extractTotalPieces(game);
+            const { awayMl, homeMl } = extractMoneylinePieces(game);
             const gameHref = `/game/${game.id}`;
 
             return (
@@ -321,7 +396,7 @@ export default function UpcomingGames() {
               >
                 <div className="h-[3px] w-full bg-[#24257C]" />
                 <div className="p-5">
-                  <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+                  <div className="flex items-center justify-between text-xs text-gray-500 mb-3 font-inter">
                     <span className="px-2 py-1 rounded-md bg-gray-50 border border-gray-200 font-medium">
                       {game.league}
                     </span>
@@ -332,13 +407,13 @@ export default function UpcomingGames() {
                     {/* Away */}
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
-                        {game.awayTeam.logo}
+                        <TeamAvatar name={game.awayTeam.name} />
                       </div>
                       <div className="min-w-0">
                         <p className="font-semibold text-[15px] text-[#111827] truncate">
                           {game.awayTeam.name}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">
+                        <p className="text-xs text-gray-500 truncate font-inter">
                           {game.venue || "Away"}
                         </p>
                       </div>
@@ -357,40 +432,84 @@ export default function UpcomingGames() {
                         <p className="font-semibold text-[15px] text-[#111827] truncate">
                           {game.homeTeam.name}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">Home</p>
+                        <p className="text-xs text-gray-500 truncate font-inter">
+                          Home
+                        </p>
                       </div>
                       <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
-                        {game.homeTeam.logo}
+                        <TeamAvatar name={game.homeTeam.name} />
                       </div>
                     </div>
                   </div>
 
-                  {/* Odds block */}
-                  <div className="rounded-xl bg-gray-50 border border-gray-100">
-                    <div className="grid grid-cols-3 divide-x divide-gray-100">
-                      <div className="p-3 text-center">
-                        <p className="text-[11px] uppercase tracking-wide text-gray-500">
-                          Spread
-                        </p>
-                        <p className="mt-0.5 font-semibold text-sm text-[#111827] [font-variant-numeric:tabular-nums]">
-                          {oddsDisplaySpread}
-                        </p>
+                  {/* Odds block: Team | Spread | Total | Moneyline with headers aligned */}
+                  <div className="rounded-xl bg-gray-50 border border-gray-100 p-3">
+                    {/* Column headers */}
+                    <div
+                      className={`${ODDS_GRID} text-[11px] uppercase tracking-wide text-gray-500 font-inter`}
+                    >
+                      <span className="text-left">Team</span>
+                      <span className="text-left">Spread</span>
+                      <span className="text-left">Total</span>
+                      <span className="text-left">ML</span>
+                    </div>
+
+                    {/* Rows */}
+                    <div className="mt-2 space-y-2">
+                      {/* Away row */}
+                      <div className={ODDS_GRID}>
+                        <span className="text-sm text-[#111827] font-medium truncate">
+                          {game.awayTeam.name}
+                        </span>
+
+                        {/* Spread */}
+                        <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+                          {awayPointText}{" "}
+                          <span className="text-xs text-gray-600">
+                            {awayPriceText}
+                          </span>
+                        </span>
+
+                        {/* Total (Over) */}
+                        <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+                          O {pointText}{" "}
+                          <span className="text-xs text-gray-600">
+                            {overText}
+                          </span>
+                        </span>
+
+                        {/* Moneyline */}
+                        <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+                          {awayMl}
+                        </span>
                       </div>
-                      <div className="p-3 text-center">
-                        <p className="text-[11px] uppercase tracking-wide text-gray-500">
-                          Total
-                        </p>
-                        <p className="mt-0.5 font-semibold text-sm text-[#111827] [font-variant-numeric:tabular-nums]">
-                          {oddsDisplayTotal}
-                        </p>
-                      </div>
-                      <div className="p-3 text-center">
-                        <p className="text-[11px] uppercase tracking-wide text-gray-500">
-                          Money Line
-                        </p>
-                        <p className="mt-0.5 font-semibold text-sm text-[#111827] [font-variant-numeric:tabular-nums]">
-                          {oddsDisplayMoneyline}
-                        </p>
+
+                      {/* Home row */}
+                      <div className={ODDS_GRID}>
+                        <span className="text-sm text-[#111827] font-medium truncate">
+                          {game.homeTeam.name}
+                        </span>
+
+                        {/* Spread */}
+                        <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+                          {homePointText}{" "}
+                          <span className="text-xs text-gray-600">
+                            {homePriceText}
+                          </span>
+                        </span>
+
+                        {/* Total (Under) */}
+                        <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+                          U {pointText}{" "}
+                          <span className="text-xs text-gray-600">
+                            {underText}
+                          </span>
+                        </span>
+
+                        {/* Moneyline */}
+                        <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+                          {homeMl}
+                        </span>
                       </div>
                     </div>
                   </div>
