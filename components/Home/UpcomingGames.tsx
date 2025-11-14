@@ -1,49 +1,158 @@
-// components/Home/UpcomingGames.tsx
 "use client";
 
 import Link from "next/link";
 import Image from "next/image";
 import React, { useMemo, useState, useEffect, useRef } from "react";
-import { FaFootballBall } from "react-icons/fa";
-import { upcomingGames } from "@/dummyData";
-import type { UpcomingGame } from "@/dummyData";
+import GameCard from "./GameCard";
 
-/** ---------- Team avatar: football icon only (no text logos) ---------- */
-function TeamAvatar({ name }: { name: string }) {
-  return (
-    <span className="text-[#24257C]" aria-label={`${name} logo`}>
-      <FaFootballBall className="w-7 h-7" />
-    </span>
-  );
-}
+/* =======================
+   Types returned by /api/odds-data
+   ======================= */
+type DbOutcome = {
+  id: string;
+  name: string;
+  price: number;
+  point?: number | null;
+};
+type DbMarket = {
+  id: string;
+  key: string;
+  lastUpdate: string;
+  outcomes: DbOutcome[];
+};
+type DbBookmaker = {
+  id: string;
+  key: string;
+  title: string;
+  lastUpdate: string;
+  markets: DbMarket[];
+};
+type DbOddsEvent = {
+  id: string;
+  sportKey: string;
+  sportTitle: "NFL" | "NBA" | "NCAAF" | "NCAAB" | "MLB" | "UFC" | string;
+  commenceTime: string; // ISO
+  homeTeam: string;
+  awayTeam: string;
+  bookmakers: DbBookmaker[];
+};
 
-/** Parse a kickoff timestamp (ms) from game fields. */
+/* =======================
+   Minimal UI type the GameCard expects
+   ======================= */
+type UpcomingGame = {
+  id: string;
+  league: string;
+  homeTeam: { name: string };
+  awayTeam: { name: string };
+  venue?: string;
+  kickoffIso?: string;
+  kickoffTs?: number;
+  odds?: {
+    spread?: {
+      home?: { point?: number | null; price?: number | null };
+      away?: { point?: number | null; price?: number | null };
+    };
+    total?: {
+      point?: number | null;
+      over?: number | null;
+      under?: number | null;
+    };
+    moneyline?: {
+      home?: number | null;
+      away?: number | null;
+    };
+  };
+};
+
+/* =======================
+   Helpers
+   ======================= */
 function getKickoffTimestampFromGame(game: UpcomingGame): number {
-  const maybeKickoffTs = (game as any)?.kickoffTs;
-  if (typeof maybeKickoffTs === "number") return maybeKickoffTs;
-
-  const iso = (game as any)?.kickoffIso ?? (game as any)?.commence_time;
-  if (typeof iso === "string") {
-    const p = Date.parse(iso);
-    if (Number.isFinite(p)) return p;
-  }
-
-  const timePart =
-    (game as any).kickoffTime?.match(/\b\d{1,2}:\d{2}\s?[AP]M\b/i)?.[0] ?? "";
-  const tzPart =
-    (game as any).kickoffTime?.match(/\b(ET|CT|MT|PT)\b/i)?.[0] ?? "";
-  const composed = timePart
-    ? `${(game as any).date} ${timePart}${tzPart ? ` ${tzPart}` : ""}`
-    : (game as any).date;
-  const parsed = Date.parse(composed as string);
-  return Number.isFinite(parsed) ? parsed : NaN;
+  const ts =
+    game.kickoffTs ?? (game.kickoffIso ? Date.parse(game.kickoffIso) : NaN);
+  return Number.isFinite(ts) ? ts : NaN;
 }
 
-/** Keep if unknown; otherwise require within the next 7 days. */
 function isWithinNextSevenDays(ts: number, nowMs: number) {
   if (!Number.isFinite(ts)) return true;
   const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
   return ts >= nowMs && ts <= nowMs + sevenDaysMs;
+}
+
+function pickBestBookmaker(books?: DbBookmaker[]) {
+  if (!books || books.length === 0) return undefined;
+
+  // Prefer FanDuel
+  const fanduel = books.find(
+    (b) =>
+      b.key?.toLowerCase() === "fanduel" || b.title?.toLowerCase() === "fanduel"
+  );
+  if (fanduel) return fanduel;
+
+  // Fallback: latest lastUpdate
+  return books.reduce((best, b) =>
+    Date.parse(b.lastUpdate) > Date.parse(best.lastUpdate) ? b : best
+  );
+}
+
+function getMarket(book: DbBookmaker | undefined, key: string) {
+  return book?.markets?.find((m) => m.key === key);
+}
+
+function findTeamOutcome(outcomes: DbOutcome[] | undefined, team: string) {
+  if (!outcomes || outcomes.length === 0) return undefined;
+  const exact = outcomes.find((o) => o.name === team);
+  if (exact) return exact;
+  // fallback for weird names: first non Over/Under/Draw
+  return outcomes.find((o) => !/over|under|draw/i.test(o.name));
+}
+
+function mapDbEventToUiGame(e: DbOddsEvent): UpcomingGame {
+  const book = pickBestBookmaker(e.bookmakers);
+  console.log(book);
+  const h2h = getMarket(book, "h2h");
+  const spreads = getMarket(book, "spreads");
+  const totals = getMarket(book, "totals");
+
+  const homeMl = findTeamOutcome(h2h?.outcomes, e.homeTeam)?.price ?? null;
+  const awayMl = findTeamOutcome(h2h?.outcomes, e.awayTeam)?.price ?? null;
+
+  const homeSpread = findTeamOutcome(spreads?.outcomes, e.homeTeam);
+  const awaySpread = findTeamOutcome(spreads?.outcomes, e.awayTeam);
+
+  const over = totals?.outcomes?.find((o) => /over/i.test(o.name));
+  const under = totals?.outcomes?.find((o) => /under/i.test(o.name));
+
+  return {
+    id: e.id,
+    league: e.sportTitle,
+    homeTeam: { name: e.homeTeam },
+    awayTeam: { name: e.awayTeam },
+    kickoffIso: e.commenceTime,
+    kickoffTs: Date.parse(e.commenceTime),
+    odds: {
+      spread: {
+        home: {
+          point: homeSpread?.point ?? null,
+          price: homeSpread?.price ?? null,
+        },
+        away: {
+          point: awaySpread?.point ?? null,
+          price: awaySpread?.price ?? null,
+        },
+      },
+      total: {
+        point: over?.point ?? under?.point ?? null,
+        over: over?.price ?? null,
+        under: under?.price ?? null,
+      },
+      moneyline: {
+        home: homeMl,
+        away: awayMl,
+      },
+    },
+  };
 }
 
 /* --------- League logos for dropdown --------- */
@@ -113,65 +222,14 @@ const leagues = [
   { href: "/league/ufc", label: "UFC", logo: LeagueLogos.UFC },
 ] as const;
 
-/* ---------- Odds formatting helpers ---------- */
-function signPoint(n?: number | null) {
-  if (typeof n !== "number" || Number.isNaN(n)) return "-";
-  return n > 0 ? `+${n}` : `${n}`;
-}
-function fmtAmerican(n?: number | null) {
-  if (typeof n !== "number" || Number.isNaN(n)) return "";
-  return n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`;
-}
+/* =======================
+   Component
+   ======================= */
+type Props = {
+  events: DbOddsEvent[]; // raw from API
+};
 
-/** Spread */
-function extractSpreadPieces(game: UpcomingGame) {
-  const s: any = (game as any)?.odds?.spread;
-  if (s && typeof s === "object" && s.away && s.home) {
-    return {
-      awayPointText: signPoint(s.away.point),
-      awayPriceText: fmtAmerican(s.away.price) || "—",
-      homePointText: signPoint(s.home.point),
-      homePriceText: fmtAmerican(s.home.price) || "—",
-    };
-  }
-  return {
-    awayPointText: "-",
-    awayPriceText: "—",
-    homePointText: "-",
-    homePriceText: "—",
-  };
-}
-
-/** Total */
-function extractTotalPieces(game: UpcomingGame) {
-  const t: any = (game as any)?.odds?.total;
-  if (t && typeof t === "object") {
-    return {
-      pointText: typeof t.point === "number" ? `${t.point}` : "-",
-      overText: fmtAmerican(t.over) || "—",
-      underText: fmtAmerican(t.under) || "—",
-    };
-  }
-  return { pointText: "-", overText: "—", underText: "—" };
-}
-
-/** Moneyline */
-function extractMoneylinePieces(game: UpcomingGame) {
-  const ml: any = (game as any)?.odds?.moneyline;
-  if (ml && typeof ml === "object") {
-    return {
-      awayMl: fmtAmerican(ml.away) || "—",
-      homeMl: fmtAmerican(ml.home) || "—",
-    };
-  }
-  return { awayMl: "—", homeMl: "—" };
-}
-
-/** Consistent grid for the odds section so headers align exactly over data */
-const ODDS_GRID =
-  "grid grid-cols-[1fr_minmax(92px,auto)_minmax(92px,auto)_minmax(64px,auto)] items-center gap-3";
-
-export default function UpcomingGames() {
+export default function UpcomingGames({ events }: Props) {
   const [selectedLeague, setSelectedLeague] = useState<
     "NFL" | "NBA" | "NCAAF" | "NCAAB" | "MLB" | "UFC"
   >("NFL");
@@ -202,9 +260,15 @@ export default function UpcomingGames() {
     return () => clearInterval(intervalId);
   }, []);
 
+  // Transform DB events -> UI games
+  const uiGames = useMemo<UpcomingGame[]>(
+    () => (events || []).map(mapDbEventToUiGame),
+    [events]
+  );
+
   const displayedGames = useMemo(() => {
-    const gamesForLeague = upcomingGames.filter(
-      (g) => g.league === selectedLeague
+    const gamesForLeague = uiGames.filter(
+      (g) => g.league.toUpperCase() === selectedLeague
     );
 
     const sortedByKickoff = [...gamesForLeague].sort((a, b) => {
@@ -220,24 +284,19 @@ export default function UpcomingGames() {
       isWithinNextSevenDays(getKickoffTimestampFromGame(g), nowTimestamp)
     );
 
-    // Live search (local to this component)
+    // Live search
     const q = query.trim().toLowerCase();
     const searched = !q
       ? withinWindow
       : withinWindow.filter((g) => {
-          const hay = [
-            g.awayTeam.name,
-            g.homeTeam.name,
-            g.venue || "",
-            g.league,
-          ]
+          const hay = [g.awayTeam.name, g.homeTeam.name, g.league]
             .join(" ")
             .toLowerCase();
           return hay.includes(q);
         });
 
     return searched.slice(0, 6);
-  }, [selectedLeague, nowTimestamp, query]);
+  }, [uiGames, selectedLeague, nowTimestamp, query]);
 
   const handleLeagueSelect = (league: typeof selectedLeague) => {
     setSelectedLeague(league);
@@ -250,9 +309,8 @@ export default function UpcomingGames() {
   return (
     <section id="upcoming" className="w-full bg-white py-16 sm:py-20">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
-        {/* Header (responsive grid) */}
+        {/* Header */}
         <div className="mb-8 sm:mb-12 grid gap-4 sm:gap-6 md:grid-cols-[1fr_auto_auto] md:items-end">
-          {/* Title/desc */}
           <div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight font-playfair">
               Upcoming Games
@@ -366,167 +424,9 @@ export default function UpcomingGames() {
 
         {/* Games Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
-          {displayedGames.map((game) => {
-            const kickoffTs = getKickoffTimestampFromGame(game);
-            const kickoffLabel = Number.isFinite(kickoffTs)
-              ? new Date(kickoffTs).toLocaleString(undefined, {
-                  weekday: "short",
-                  month: "short",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "2-digit",
-                })
-              : ((game as any).kickoffTime as string) ?? "TBD";
-
-            const {
-              awayPointText,
-              awayPriceText,
-              homePointText,
-              homePriceText,
-            } = extractSpreadPieces(game);
-            const { pointText, overText, underText } = extractTotalPieces(game);
-            const { awayMl, homeMl } = extractMoneylinePieces(game);
-            const gameHref = `/game/${game.id}`;
-
-            return (
-              <div
-                key={game.id}
-                className="group bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#24257C]"
-              >
-                <div className="h-[3px] w-full bg-[#24257C]" />
-                <div className="p-5">
-                  <div className="flex items-center justify-between text-xs text-gray-500 mb-3 font-inter">
-                    <span className="px-2 py-1 rounded-md bg-gray-50 border border-gray-200 font-medium">
-                      {game.league}
-                    </span>
-                    <span className="font-medium">{kickoffLabel}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4 mb-5">
-                    {/* Away */}
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
-                        <TeamAvatar name={game.awayTeam.name} />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-semibold text-[15px] text-[#111827] truncate">
-                          {game.awayTeam.name}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate font-inter">
-                          {"Away"}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* VS */}
-                    <div className="px-2">
-                      <span className="text-sm font-semibold text-gray-400">
-                        vs
-                      </span>
-                    </div>
-
-                    {/* Home */}
-                    <div className="flex items-center gap-3 flex-1 min-w-0 justify-end">
-                      <div className="min-w-0 text-right">
-                        <p className="font-semibold text-[15px] text-[#111827] truncate">
-                          {game.homeTeam.name}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate font-inter">
-                          Home
-                        </p>
-                      </div>
-                      <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
-                        <TeamAvatar name={game.homeTeam.name} />
-                      </div>
-                      <p className="text-xs text-gray-500 truncate font-inter">
-                        {game.venue || "Home"}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Odds block: Team | Spread | Total | Moneyline with headers aligned */}
-                  <div className="rounded-xl bg-gray-50 border border-gray-100 p-3">
-                    {/* Column headers */}
-                    <div
-                      className={`${ODDS_GRID} text-[11px] uppercase tracking-wide text-gray-500 font-inter`}
-                    >
-                      <span className="text-left">Team</span>
-                      <span className="text-left">Spread</span>
-                      <span className="text-left">Total</span>
-                      <span className="text-left">ML</span>
-                    </div>
-
-                    {/* Rows */}
-                    <div className="mt-2 space-y-2">
-                      {/* Away row */}
-                      <div className={ODDS_GRID}>
-                        <span className="text-sm text-[#111827] font-medium truncate">
-                          {game.awayTeam.name}
-                        </span>
-
-                        {/* Spread */}
-                        <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
-                          {awayPointText}{" "}
-                          <span className="text-xs text-gray-600">
-                            {awayPriceText}
-                          </span>
-                        </span>
-
-                        {/* Total (Over) */}
-                        <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
-                          O {pointText}{" "}
-                          <span className="text-xs text-gray-600">
-                            {overText}
-                          </span>
-                        </span>
-
-                        {/* Moneyline */}
-                        <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
-                          {awayMl}
-                        </span>
-                      </div>
-
-                      {/* Home row */}
-                      <div className={ODDS_GRID}>
-                        <span className="text-sm text-[#111827] font-medium truncate">
-                          {game.homeTeam.name}
-                        </span>
-
-                        {/* Spread */}
-                        <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
-                          {homePointText}{" "}
-                          <span className="text-xs text-gray-600">
-                            {homePriceText}
-                          </span>
-                        </span>
-
-                        {/* Total (Under) */}
-                        <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
-                          U {pointText}{" "}
-                          <span className="text-xs text-gray-600">
-                            {underText}
-                          </span>
-                        </span>
-
-                        {/* Moneyline */}
-                        <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
-                          {homeMl}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4">
-                    <Link href={`/prediction`}>
-                      <span className="inline-flex w-full h-10 items-center justify-center rounded-lg bg-[#24257C] text-white text-[13px] font-inter font-bold uppercase tracking-wide transition group-hover:bg-[#C83495] group-hover:-translate-y-0.5">
-                        Read Prediction
-                      </span>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {displayedGames.map((game) => (
+            <GameCard key={game.id} game={game} predictionHref="/prediction" />
+          ))}
         </div>
       </div>
     </section>

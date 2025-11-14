@@ -1,4 +1,4 @@
-// app/api/odds-sync/route.ts
+// app/api/odds-detail/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
