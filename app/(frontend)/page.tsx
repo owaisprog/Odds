@@ -3,17 +3,9 @@ import HomeHero from "@/components/Home/HomeHero";
 import UpcomingGames from "@/components/Home/UpcomingGames";
 import { prisma } from "@/lib/prisma";
 
-// Small helper so this works in dev & prod
-function getBaseUrl() {
-  return (
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    "http://localhost:3000"
-  );
-}
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  // Featured articles (unchanged)
   const articles = await prisma.article.findMany({
     where: { isFeatured: true },
     orderBy: { publishedAt: "desc" },
@@ -43,17 +35,47 @@ export default async function Home() {
     league: a.league,
   }));
 
-  // 🔥 Fetch DB events from your own API
-  const baseUrl = getBaseUrl();
-  const res = await fetch(`${baseUrl}/api/odds-data`, { cache: "no-store" });
-  const events = res.ok ? await res.json() : [];
-  // console.log(events);
-  // console.log(events.length);
+  // Direct DB read (same shape as your /api/odds-data)
+  const dbEvents = await prisma.oddsEvent.findMany({
+    include: {
+      bookmakers: {
+        include: {
+          markets: { include: { outcomes: true } },
+        },
+      },
+    },
+    orderBy: { commenceTime: "asc" },
+  });
+
+  const events = dbEvents.map((e) => ({
+    id: e.id,
+    sportKey: e.sportKey,
+    sportTitle: e.sportTitle,
+    commenceTime: e.commenceTime.toISOString(),
+    homeTeam: e.homeTeam,
+    awayTeam: e.awayTeam,
+    bookmakers: e.bookmakers.map((b) => ({
+      id: b.id,
+      key: b.key,
+      title: b.title,
+      lastUpdate: b.lastUpdate.toISOString(),
+      markets: b.markets.map((m) => ({
+        id: m.id,
+        key: m.key,
+        lastUpdate: m.lastUpdate.toISOString(),
+        outcomes: m.outcomes.map((o) => ({
+          id: o.id,
+          name: o.name,
+          price: o.price,
+          point: o.point ?? null,
+        })),
+      })),
+    })),
+  }));
 
   return (
     <main>
       <HomeHero initialFeatured={initialFeatured} />
-      {/* Pass DB events to UpcomingGames */}
       <UpcomingGames events={events} />
       <div className="h-20" />
     </main>
