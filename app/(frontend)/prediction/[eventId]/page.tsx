@@ -177,21 +177,21 @@ export default async function EventPredictionPage({ params }: PageProps) {
   return (
     <main className="w-full bg-[#FAFAFA] min-h-screen">
       <section className="w-full py-10 sm:py-14">
-        <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-4xl">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           {/* Breadcrumb */}
-          <nav className="mb-6 text-xs text-gray-500 font-inter space-x-1">
-            <Link href="/" className="hover:text-[#24257C]">
+          <nav className="mb-6 text-xs text-[#6B7280] font-inter space-x-1">
+            <Link href="/" className="hover:text-[#24257C] transition-colors">
               Home
             </Link>
             <span>/</span>
             <Link
               href={`/league/${leagueSlug}`}
-              className="hover:text-[#24257C]"
+              className="hover:text-[#24257C] transition-colors"
             >
               {event.sportTitle}
             </Link>
             <span>/</span>
-            <span className="text-gray-700">Game Preview</span>
+            <span className="text-[#111827]">Game Preview</span>
           </nav>
 
           {/* Heading */}
@@ -199,89 +199,93 @@ export default async function EventPredictionPage({ params }: PageProps) {
             <p className="text-xs font-semibold uppercase tracking-wide text-[#24257C] mb-2 font-inter">
               {event.sportTitle} · {kickoffLabel}
             </p>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight font-playfair">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight font-inter">
               {event.awayTeam} vs {event.homeTeam} Odds &amp; Prediction
             </h1>
           </header>
 
           {/* Odds summary card */}
           <section className="mb-10">
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 sm:p-6">
-              <div className="flex items-center justify-between mb-4">
+            <div className="bg-white rounded-2xl shadow-[0px_4px_8px_rgba(0,0,0,0.08)] hover:shadow-[0px_6px_12px_rgba(0,0,0,0.15)] transition-shadow p-6 sm:p-7 border-t-[3px] border-t-[#24257C]">
+              <div className="flex items-center justify-between mb-5">
                 <div>
-                  <p className="text-xs uppercase text-gray-500 font-inter">
+                  <p className="text-[11px] uppercase tracking-wide text-[#6B7280] font-inter font-medium mb-1">
                     Line from
                   </p>
-                  <p className="text-sm font-semibold text-[#111827]">
+                  <p className="text-sm font-semibold text-[#111827] font-inter">
                     {odds.bookmakerTitle}
                   </p>
                 </div>
-                <div className="text-right text-xs text-gray-500 font-inter">
-                  <p className="font-medium">Kickoff</p>
-                  <p>{kickoffLabel}</p>
+                <div className="text-right">
+                  <p className="text-[11px] uppercase tracking-wide text-[#6B7280] font-inter font-medium mb-1">
+                    Kickoff
+                  </p>
+                  <p className="text-sm font-medium text-[#111827] font-inter">
+                    {kickoffLabel}
+                  </p>
                 </div>
               </div>
 
               {/* Team odds */}
-              <div className="rounded-xl bg-gray-50 border border-gray-100 p-3 sm:p-4">
-                <div className="grid grid-cols-[1fr_minmax(92px,auto)_minmax(64px,auto)] items-center gap-3 text-[11px] uppercase tracking-wide text-gray-500 font-inter mb-2">
+              <div className="rounded-xl bg-[#FAFAFA] p-4 sm:p-5">
+                <div className="grid grid-cols-[1fr_minmax(92px,auto)_minmax(64px,auto)] items-center gap-3 text-[11px] uppercase tracking-wide text-[#6B7280] font-inter font-medium mb-3">
                   <span>Team</span>
                   <span>Spread</span>
                   <span>ML</span>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {/* Away row */}
                   <div className="grid grid-cols-[1fr_minmax(92px,auto)_minmax(64px,auto)] items-center gap-3">
-                    <span className="text-sm text-[#111827] font-medium truncate">
+                    <span className="text-base text-[#111827] font-semibold truncate font-inter">
                       {event.awayTeam}
                     </span>
-                    <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+                    <span className="text-sm font-bold text-[#24257C] font-inter tabular-nums">
                       {odds.spread.awayPointText}{" "}
-                      <span className="text-xs text-gray-600">
+                      <span className="text-xs text-[#6B7280] font-medium">
                         {odds.spread.awayPriceText}
                       </span>
                     </span>
-                    <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+                    <span className="text-sm font-bold text-[#24257C] font-inter tabular-nums">
                       {odds.moneyline.awayMl}
                     </span>
                   </div>
 
                   {/* Home row */}
                   <div className="grid grid-cols-[1fr_minmax(92px,auto)_minmax(64px,auto)] items-center gap-3">
-                    <span className="text-sm text-[#111827] font-medium truncate">
+                    <span className="text-base text-[#111827] font-semibold truncate font-inter">
                       {event.homeTeam}
                     </span>
-                    <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+                    <span className="text-sm font-bold text-[#24257C] font-inter tabular-nums">
                       {odds.spread.homePointText}{" "}
-                      <span className="text-xs text-gray-600">
+                      <span className="text-xs text-[#6B7280] font-medium">
                         {odds.spread.homePriceText}
                       </span>
                     </span>
-                    <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+                    <span className="text-sm font-bold text-[#24257C] font-inter tabular-nums">
                       {odds.moneyline.homeMl}
                     </span>
                   </div>
                 </div>
 
                 {/* Game total row */}
-                <div className="mt-4 pt-3 border-t border-gray-200">
-                  <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-gray-500 font-inter mb-1">
+                <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
+                  <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-[#6B7280] font-inter font-medium mb-2">
                     <span>Game Total</span>
                     <span>Over</span>
                     <span>Under</span>
                   </div>
-                  <div className="flex items-center justify-between text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+                  <div className="flex items-center justify-between text-sm font-bold text-[#24257C] font-inter tabular-nums">
                     <span>{odds.total.pointText}</span>
                     <span>
                       O {odds.total.pointText}{" "}
-                      <span className="text-xs text-gray-600">
+                      <span className="text-xs text-[#6B7280] font-medium">
                         {odds.total.overText}
                       </span>
                     </span>
                     <span>
                       U {odds.total.pointText}{" "}
-                      <span className="text-xs text-gray-600">
+                      <span className="text-xs text-[#6B7280] font-medium">
                         {odds.total.underText}
                       </span>
                     </span>
@@ -293,19 +297,21 @@ export default async function EventPredictionPage({ params }: PageProps) {
 
           {/* Prediction article */}
           {prediction ? (
-            <article className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 sm:p-7 max-w-none">
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#111827] font-playfair mb-4">
+            <article className="bg-white rounded-2xl shadow-[0px_4px_8px_rgba(0,0,0,0.08)] p-6 sm:p-8 max-w-none border-t-[3px] border-t-[#24257C]">
+              <h2 className="text-2xl sm:text-3xl font-bold text-[#111827] font-inter mb-5">
                 {prediction.heading}
               </h2>
-              <div className="space-y-4 text-[15px] leading-relaxed text-gray-700 font-inter whitespace-pre-line">
+              <div className="space-y-4 text-[15px] leading-relaxed text-[#111827] font-inter whitespace-pre-line">
                 {prediction.description.split(/\n{2,}/).map((para, idx) => (
                   <p key={idx}>{para.trim()}</p>
                 ))}
               </div>
             </article>
           ) : (
-            <div className="bg-white border border-dashed border-gray-300 rounded-2xl p-6 text-center text-gray-500 text-sm font-inter">
-              Prediction article coming soon for this matchup.
+            <div className="bg-white rounded-2xl shadow-[0px_4px_8px_rgba(0,0,0,0.08)] p-8 text-center border-t-[3px] border-t-[#24257C]">
+              <p className="text-[#6B7280] text-sm font-inter font-medium">
+                Prediction article coming soon for this matchup.
+              </p>
             </div>
           )}
         </div>

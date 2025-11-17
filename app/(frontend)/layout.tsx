@@ -8,10 +8,10 @@ export default function FrontendLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SearchProvider>
+    <div suppressHydrationWarning={true}>
       <NavBar />
       {children}
       <Footer />
-    </SearchProvider>
+    </div>
   );
 }

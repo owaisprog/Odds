@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { FaFootballBall } from "react-icons/fa";
 
@@ -144,6 +145,7 @@ export default function GameCard({
 
   // If parent didn't pass a href, default to the dynamic league route
   const href = predictionHref ?? `/prediction/${game.id}`;
+  console.log(game.awayTeam.name, game.homeTeam.name, game.league);
 
   return (
     <div
@@ -160,13 +162,18 @@ export default function GameCard({
           </span>
           <span className="font-medium">{kickoffLabel}</span>
         </div>
-
         {/* Teams row */}
         <div className="flex items-center justify-between gap-4 mb-5">
           {/* Away */}
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
-              <TeamAvatar name={game.awayTeam.name} />
+              <Image
+                src={`/${game.league}/${game.awayTeam.name}.png`}
+                alt={`${game.homeTeam.name} logo`}
+                width={44}
+                height={44}
+                className="w-15 h-15 object-contain"
+              />
             </div>
             <div className="min-w-0">
               <p className="font-semibold text-[15px] text-[#111827] truncate">
@@ -190,11 +197,14 @@ export default function GameCard({
               <p className="text-xs text-gray-500 truncate font-inter">Home</p>
             </div>
             <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
-              <TeamAvatar name={game.homeTeam.name} />
+              <Image
+                src={`/${game.league}/${game.homeTeam.name}.png`}
+                alt={`${game.homeTeam.name} logo`}
+                width={44}
+                height={44}
+                className="w-15 h-15 object-contain"
+              />
             </div>
-            <p className="text-xs text-gray-500 truncate font-inter">
-              {game.venue || "Home"}
-            </p>
           </div>
         </div>
 

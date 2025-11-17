@@ -33,3 +33,11 @@ export async function GET(req: Request) {
 
   return NextResponse.json(events);
 }
+
+
+    // <Image
+    //         src={`/${league}/${fsdfsdf}.png`}
+    //         alt="External link"
+    //         width={16}
+    //         height={16}
+    //       />
