@@ -1,3 +1,4 @@
+// components/Home/UpcomingGames.tsx
 "use client";
 
 import Link from "next/link";
@@ -74,12 +75,6 @@ function getKickoffTimestampFromGame(game: UpcomingGame): number {
   return Number.isFinite(ts) ? ts : NaN;
 }
 
-function isWithinNextSevenDays(ts: number, nowMs: number) {
-  if (!Number.isFinite(ts)) return true;
-  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
-  return ts >= nowMs && ts <= nowMs + sevenDaysMs;
-}
-
 function pickBestBookmaker(books?: DbBookmaker[]) {
   if (!books || books.length === 0) return undefined;
 
@@ -110,7 +105,6 @@ function findTeamOutcome(outcomes: DbOutcome[] | undefined, team: string) {
 
 function mapDbEventToUiGame(e: DbOddsEvent): UpcomingGame {
   const book = pickBestBookmaker(e.bookmakers);
-  // console.log(book);
   const h2h = getMarket(book, "h2h");
   const spreads = getMarket(book, "spreads");
   const totals = getMarket(book, "totals");
@@ -253,19 +247,13 @@ export default function UpcomingGames({ events }: Props) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Update periodically so games drop off at kickoff.
-  const [nowTimestamp, setNowTimestamp] = useState(() => Date.now());
-  useEffect(() => {
-    const intervalId = setInterval(() => setNowTimestamp(Date.now()), 30_000);
-    return () => clearInterval(intervalId);
-  }, []);
-
   // Transform DB events -> UI games
   const uiGames = useMemo<UpcomingGame[]>(
     () => (events || []).map(mapDbEventToUiGame),
     [events]
   );
 
+  // Show ALL events for selected league, but only 6 cards (soonest first)
   const displayedGames = useMemo(() => {
     const gamesForLeague = uiGames.filter(
       (g) => g.league.toUpperCase() === selectedLeague
@@ -280,15 +268,10 @@ export default function UpcomingGames({ events }: Props) {
       return aTs - bTs;
     });
 
-    const withinWindow = sortedByKickoff.filter((g) =>
-      isWithinNextSevenDays(getKickoffTimestampFromGame(g), nowTimestamp)
-    );
-
-    // Live search
     const q = query.trim().toLowerCase();
     const searched = !q
-      ? withinWindow
-      : withinWindow.filter((g) => {
+      ? sortedByKickoff
+      : sortedByKickoff.filter((g) => {
           const hay = [g.awayTeam.name, g.homeTeam.name, g.league]
             .join(" ")
             .toLowerCase();
@@ -296,7 +279,7 @@ export default function UpcomingGames({ events }: Props) {
         });
 
     return searched.slice(0, 6);
-  }, [uiGames, selectedLeague, nowTimestamp, query]);
+  }, [uiGames, selectedLeague, query]);
 
   const handleLeagueSelect = (league: typeof selectedLeague) => {
     setSelectedLeague(league);
@@ -425,7 +408,12 @@ export default function UpcomingGames({ events }: Props) {
         {/* Games Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
           {displayedGames.map((game) => (
-            <GameCard key={game.id} game={game} predictionHref="/prediction" />
+            <GameCard
+              key={game.id}
+              game={game}
+              // ⬇️ this is the important bit: link to /league/[eventId]
+              predictionHref={`/prediction/${game.id}`}
+            />
           ))}
         </div>
       </div>

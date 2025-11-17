@@ -17,6 +17,15 @@ export async function GET(req: Request) {
   const events = await prisma.oddsEvent.findMany({
     where: { id: eventId },
     include: {
+      bookmakers: {
+        include: {
+          markets: {
+            include: {
+              outcomes: true,
+            },
+          },
+        },
+      },
       eventpredictions: true,
     },
     orderBy: { commenceTime: "asc" },

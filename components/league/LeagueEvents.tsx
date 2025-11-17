@@ -189,7 +189,11 @@ export default function LeagueEvents({ events }: Props) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
           {uiGames.map((g) => (
-            <GameCard key={g.id} game={g} predictionHref="/prediction" />
+            <GameCard
+              key={g.id}
+              game={g}
+              predictionHref={`/prediction/${g.id}`}
+            />
           ))}
         </div>
       )}

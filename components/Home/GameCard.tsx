@@ -111,19 +111,19 @@ function extractMoneylinePieces(game: GameCardGame) {
   return { awayMl: "—", homeMl: "—" };
 }
 
-/** Consistent grid for the odds section so headers align exactly over data */
-const ODDS_GRID =
-  "grid grid-cols-[1fr_minmax(92px,auto)_minmax(92px,auto)_minmax(64px,auto)] items-center gap-3";
+/** Grid for TEAM rows: Team | Spread | ML */
+const ODDS_GRID_TEAMS =
+  "grid grid-cols-[1fr_minmax(92px,auto)_minmax(64px,auto)] items-center gap-3";
 
 type GameCardProps = {
   game: GameCardGame;
-  predictionHref?: string; // optional, default "/prediction"
+  predictionHref?: string; // optional override; defaults to /league/[id]
   className?: string;
 };
 
 export default function GameCard({
   game,
-  predictionHref = "/prediction",
+  predictionHref,
   className = "",
 }: GameCardProps) {
   const kickoffTs = getKickoffTimestampFromGame(game);
@@ -141,6 +141,9 @@ export default function GameCard({
     extractSpreadPieces(game);
   const { pointText, overText, underText } = extractTotalPieces(game);
   const { awayMl, homeMl } = extractMoneylinePieces(game);
+
+  // If parent didn't pass a href, default to the dynamic league route
+  const href = predictionHref ?? `/prediction/${game.id}`;
 
   return (
     <div
@@ -197,18 +200,19 @@ export default function GameCard({
 
         {/* Odds block */}
         <div className="rounded-xl bg-gray-50 border border-gray-100 p-3">
+          {/* Header for team odds */}
           <div
-            className={`${ODDS_GRID} text-[11px] uppercase tracking-wide text-gray-500 font-inter`}
+            className={`${ODDS_GRID_TEAMS} text-[11px] uppercase tracking-wide text-gray-500 font-inter`}
           >
             <span className="text-left">Team</span>
             <span className="text-left">Spread</span>
-            <span className="text-left">Total</span>
             <span className="text-left">ML</span>
           </div>
 
+          {/* Team rows */}
           <div className="mt-2 space-y-2">
             {/* Away row */}
-            <div className={ODDS_GRID}>
+            <div className={ODDS_GRID_TEAMS}>
               <span className="text-sm text-[#111827] font-medium truncate">
                 {game.awayTeam.name}
               </span>
@@ -219,17 +223,12 @@ export default function GameCard({
               </span>
 
               <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
-                O {pointText}{" "}
-                <span className="text-xs text-gray-600">{overText}</span>
-              </span>
-
-              <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
                 {awayMl}
               </span>
             </div>
 
             {/* Home row */}
-            <div className={ODDS_GRID}>
+            <div className={ODDS_GRID_TEAMS}>
               <span className="text-sm text-[#111827] font-medium truncate">
                 {game.homeTeam.name}
               </span>
@@ -240,12 +239,28 @@ export default function GameCard({
               </span>
 
               <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+                {homeMl}
+              </span>
+            </div>
+          </div>
+
+          {/* Separate Total row */}
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-gray-500 font-inter mb-1">
+              <span className="text-left">Game Total</span>
+              <span className="text-right">Over</span>
+              <span className="text-right">Under</span>
+            </div>
+
+            <div className="flex items-center justify-between text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+              <span className="text-left">{pointText}</span>
+              <span className="text-right">
+                O {pointText}{" "}
+                <span className="text-xs text-gray-600">{overText}</span>
+              </span>
+              <span className="text-right">
                 U {pointText}{" "}
                 <span className="text-xs text-gray-600">{underText}</span>
-              </span>
-
-              <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
-                {homeMl}
               </span>
             </div>
           </div>
@@ -253,7 +268,7 @@ export default function GameCard({
 
         {/* CTA */}
         <div className="mt-4">
-          <Link href={predictionHref}>
+          <Link href={href}>
             <span className="inline-flex w-full h-10 items-center justify-center rounded-lg bg-[#24257C] text-white text-[13px] font-inter font-bold uppercase tracking-wide transition group-hover:bg-[#C83495] group-hover:-translate-y-0.5">
               Read Prediction
             </span>
