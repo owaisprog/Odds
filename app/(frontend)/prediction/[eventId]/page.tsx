@@ -3,15 +3,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 function getBaseUrl() {
-  // 1. Explicit app URL (recommended)
+  // 1. Explicit app URL (recommended – use this in Vercel env)
   if (process.env.NEXT_PUBLIC_APP_URL) {
-    return process.env.NEXT_PUBLIC_APP_URL;
+    return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
   }
 
-  // 2. Vercel system URL (no protocol)
+  // 2. Vercel system URL (no protocol by default – so we add https://)
   if (process.env.VERCEL_URL) {
-    console.log("VERCEL Read");
-    return process.env.VERCEL_URL;
+    console.log("VERCEL Read", process.env.VERCEL_URL);
+    const url = process.env.VERCEL_URL;
+    // handle both "odds-xxx.vercel.app" and "https://odds-xxx.vercel.app"
+    return url.startsWith("http") ? url.replace(/\/$/, "") : `https://${url}`;
   }
 
   // 3. Local dev
