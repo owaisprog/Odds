@@ -3,16 +3,20 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 function getBaseUrl() {
-  const url =
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.VERCEL_URL ||
-    "http://localhost:3000";
-
-  if (!url.startsWith("http://") && !url.startsWith("https://")) {
-    return `https://${url}`; // Vercel URLs are https
+  // 1. Explicit app URL (recommended)
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL;
   }
 
-  return url;
+  // 2. Vercel system URL (no protocol)
+  if (process.env.VERCEL_URL) {
+    console.log("VERCEL Read");
+    return process.env.VERCEL_URL;
+  }
+
+  // 3. Local dev
+  console.log("Local Read");
+  return "http://localhost:3000";
 }
 
 /* ===== Types matching /api/odds-detail response ===== */
@@ -144,11 +148,12 @@ export default async function EventPredictionPage({ params }: PageProps) {
   const { eventId } = await params;
 
   const baseUrl = getBaseUrl();
+  console.log("baseUrl", baseUrl);
   const res = await fetch(
     `${baseUrl}/api/odds-detail?eventId=${encodeURIComponent(eventId)}`,
     { cache: "no-store" }
   );
-
+  console.log("res", res);
   if (!res.ok) {
     if (res.status === 404) notFound();
     throw new Error("Failed to load odds detail");

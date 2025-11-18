@@ -145,7 +145,6 @@ export default function GameCard({
 
   // If parent didn't pass a href, default to the dynamic league route
   const href = predictionHref ?? `/prediction/${game.id}`;
-  console.log(game.awayTeam.name, game.homeTeam.name, game.league);
 
   return (
     <div
