@@ -23,11 +23,9 @@ export async function POST() {
   }
 
   const SPORTS: { key: string; title: string }[] = [
-    { key: "basketball_nba", title: "NBA" },
-    { key: "americanfootball_ncaaf", title: "NCAAF" },
-    { key: "basketball_ncaab", title: "NCAAB" },
+
     { key: "baseball_mlb", title: "MLB" },
-    { key: "mma_mixed_martial_arts", title: "UFC" },
+   
   ];
 
   const BASE = "https://api.the-odds-api.com/v4";

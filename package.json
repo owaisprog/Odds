@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
-    "build": "next build --webpack",
-    "start": "next start",
+   "dev": "concurrently -k -n WEB,CRON -c auto \"next dev --webpack\" \"npm:cron:dev\"",
+  "build": "next build --webpack",
+  "start": "concurrently -k -n WEB,CRON -c auto \"next start --webpack\" \"npm:cron:start\"",
+  "cron:dev": "tsx scripts/sync-odds-cron.ts",
+  "cron:start": "NODE_ENV=production tsx scripts/sync-odds-cron.ts",
+
     "postinstall": "prisma generate",
     "lint": "eslint",
     "seed:api": "tsx ./seed.ts"
@@ -16,8 +19,10 @@
     "@toon-format/toon": "^1.0.0",
     "axios": "^1.13.1",
     "bcryptjs": "^3.0.3",
+    "concurrently": "^9.2.1",
     "jsonwebtoken": "^9.0.2",
     "next": "16.0.0",
+    "node-cron": "^4.2.1",
     "openai": "^6.8.1",
     "react": "19.2.0",
     "react-datepicker": "^8.8.0",

@@ -102,6 +102,7 @@ model OddsEvent {
   commenceTime     DateTime
   homeTeam         String
   awayTeam         String
+  image            String            @default("")
   bookmakers       OddsBookmaker[]
   eventpredictions Eventprediction[]
   createdAt        DateTime          @default(now())

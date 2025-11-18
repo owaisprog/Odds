@@ -1,11 +1,11 @@
-// lib/odds-prediction.ts
+// app/api/odds-sync/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import OpenAI from "openai";
 import { encode } from "@toon-format/toon";
 
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 interface OddsArticleResponse {
@@ -14,10 +14,21 @@ interface OddsArticleResponse {
   description: string;
 }
 
-export async function MakeOddsPrediction(sportTitle: string) {
+// -----------------------------
+// Route
+// -----------------------------
+const todayDaysFromNow = new Date();
+todayDaysFromNow.setDate(todayDaysFromNow.getDate() + 2);
+
+export async function handleOddsPrediction() {
   try {
     const events = await prisma.oddsEvent.findMany({
-      where: { sportTitle },
+      where: {
+        commenceTime: {
+          gte: new Date(),
+          lte: todayDaysFromNow,
+        },
+      },
       include: {
         bookmakers: {
           include: {
