@@ -361,6 +361,16 @@ async function prunePastEvents() {
       },
     },
   });
+
+  await prisma.eventprediction.findMany({
+    where: {
+      event: {
+        commenceTime: {
+          lt: new Date(), // anything before "now"
+        },
+      },
+    },
+  });
 }
 
 // Main sync function
