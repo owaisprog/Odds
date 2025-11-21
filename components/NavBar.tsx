@@ -119,8 +119,8 @@ function NavBar() {
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="shrink-0">
-            <Image src="/WebLogo.png" width={160} height={160} alt="Logo" />
+          <Link href="/" className="  h-20 flex items-center">
+            <Image src="/WebLogo.png" width={160} height={20} alt="Logo" />
           </Link>
 
           {/* Desktop Navigation */}

@@ -115,7 +115,7 @@ function extractMoneylinePieces(game: GameCardGame) {
 
 /** Grid for TEAM rows: Team | Spread | ML */
 const ODDS_GRID_TEAMS =
-  "grid grid-cols-[1fr_minmax(92px,auto)_minmax(64px,auto)] items-center gap-3";
+  "grid  grid-cols-[1fr_minmax(92px,auto)_minmax(64px,auto)] items-center gap-3";
 
 type GameCardProps = {
   game: GameCardGame;
@@ -267,18 +267,18 @@ export default function GameCard({
           {/* Separate Total row */}
           <div className="mt-3 pt-3 border-t border-gray-200">
             <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-gray-500 font-inter mb-1">
-              <span className="text-left">Game Total</span>
-              <span className="text-right">Over</span>
-              <span className="text-right">Under</span>
+              <span className="text-left w-full">Game Total</span>
+              <span className="text-center w-full">Over</span>
+              <span className="text-right w-full">Under</span>
             </div>
 
             <div className="flex items-center justify-between text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
-              <span className="text-left">{pointText}</span>
-              <span className="text-right ml-12">
+              <span className="text-left w-full   ">{pointText}</span>
+              <span className="text-center w-full   ">
                 {pointText}{" "}
-                <span className="text-xs text-gray-600">{overText}</span>
+                <span className="text-xs text-gray-600 ">{overText}</span>
               </span>
-              <span className="text-right">
+              <span className="text-right w-full   ">
                 {pointText}{" "}
                 <span className="text-xs text-gray-600">{underText}</span>
               </span>
