@@ -362,12 +362,10 @@ async function prunePastEvents() {
     },
   });
 
-  await prisma.eventprediction.findMany({
+  await prisma.oddsEvent.deleteMany({
     where: {
-      event: {
-        commenceTime: {
-          lt: new Date(), // anything before "now"
-        },
+      commenceTime: {
+        lt: new Date(), // anything before "now"
       },
     },
   });

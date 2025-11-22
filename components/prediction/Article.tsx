@@ -1,6 +1,7 @@
 // components/prediction/Article.tsx
+"use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type {
@@ -117,24 +118,42 @@ const getBestOdds = (event: DetailEvent): NormalizedOdds | null => {
 };
 
 const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
-  const kickoff = new Date(event.commenceTime);
-  const kickoffLabel = kickoff.toLocaleString(undefined, {
+  const kickoffDate = new Date(event.commenceTime);
+
+  // Always show US (ET) time
+  const kickoffDateET = new Intl.DateTimeFormat("en-US", {
     weekday: "short",
     month: "short",
     day: "numeric",
+    timeZone: "America/New_York",
+  }).format(kickoffDate);
+
+  const kickoffTimeET = new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
     minute: "2-digit",
-  });
-  console.log(relatedArticles);
+    timeZone: "America/New_York",
+  }).format(kickoffDate);
+
+  const kickoffLabel = `${kickoffDateET} • ${kickoffTimeET} ET`;
+
   const odds = useMemo(() => getBestOdds(event), [event]);
 
-  // Precompute total pieces (used only when odds exists)
+  // Logo visibility (same pattern as GameCard, but using local event data)
+  const [awayLogoVisible, setAwayLogoVisible] = useState(true);
+  const [homeLogoVisible, setHomeLogoVisible] = useState(true);
+  const leagueFolder = event.sportTitle; // e.g. "NFL", "NBA"
+
+  // Totals
   const totalPoint =
     odds?.total?.over?.point?.replace(/^O\s*/, "") ??
     odds?.total?.under?.point?.replace(/^U\s*/, "") ??
-    "-";
+    "—";
   const overPrice = odds?.total?.over?.price ?? "—";
   const underPrice = odds?.total?.under?.price ?? "—";
+  const totalPriceLabel =
+    overPrice === "—" && underPrice === "—"
+      ? "—"
+      : `${overPrice}o / ${underPrice}u`;
 
   return (
     <article className="bg-[#FAFAFA] font-inter text-[#111827]">
@@ -169,15 +188,16 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
           {/* Article Header */}
           <header className="mb-8">
             <div className="flex items-center gap-3 mb-4">
-              <span className="bg-[#24257C] text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded">
+              <span className="bg-[#24257C] text-white text-xs sm:text-sm font-bold uppercase tracking-wider px-3 py-1 rounded">
                 {event.sportTitle}
               </span>
-              <span className="text-sm text-[#111827] font-inter">
+              <span className="text-sm sm:text-base text-[#111827] font-inter">
                 {kickoffLabel}
               </span>
             </div>
             <h1 className="font-playfair text-3xl sm:text-4xl lg:text-5xl font-bold text-[#111827] leading-tight mb-3">
-              {event.awayTeam} vs {event.homeTeam} Prediction, Odds & Best Bets
+              {event.awayTeam} vs {event.homeTeam} Prediction, Odds &amp; Best
+              Bets
             </h1>
             <p className="font-inter text-lg text-gray-600">
               Expert analysis and betting picks for this {event.sportTitle}{" "}
@@ -185,108 +205,159 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
             </p>
           </header>
 
-          {/* Odds Table Card */}
+          {/* Odds Card */}
           {odds ? (
-            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-8">
-              <div className="bg-[#24257C] px-4 py-3 flex justify-between items-center">
-                <span className="text-white font-bold text-sm uppercase tracking-wider">
-                  Current Odds
-                </span>
-                <span className="text-[#25818F] text-xs font-medium bg-white px-2 py-1 rounded">
-                  via {odds.bookmakerName}
-                </span>
+            <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mb-8">
+              {/* Top row: logos + time (US / ET) */}
+              <div className="px-6 py-5 border-b border-gray-200 bg-[#FAFAFA] flex items-center justify-between">
+                {/* Away logo */}
+                <div className="flex-1 flex justify-start">
+                  {awayLogoVisible && (
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
+                      <Image
+                        src={`/${leagueFolder}/${event.awayTeam}.png`}
+                        alt={`${event.awayTeam} logo`}
+                        width={80}
+                        height={80}
+                        className="w-14 h-14 sm:w-18 sm:h-18 object-contain"
+                        onError={() => setAwayLogoVisible(false)}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Center: kickoff info */}
+                <div className="flex-1 text-center px-2 border-x border-gray-200">
+                  <p className="text-base sm:text-lg font-bold text-[#111827]">
+                    {kickoffDateET}
+                  </p>
+                  <p className="text-sm sm:text-base font-semibold text-[#111827]">
+                    {kickoffTimeET} ET
+                  </p>
+                  <p className="mt-1 text-xs sm:text-sm font-semibold uppercase tracking-wider text-gray-500">
+                    {event.sportTitle}
+                  </p>
+                </div>
+
+                {/* Home logo */}
+                <div className="flex-1 flex justify-end">
+                  {homeLogoVisible && (
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
+                      <Image
+                        src={`/${leagueFolder}/${event.homeTeam}.png`}
+                        alt={`${event.homeTeam} logo`}
+                        width={80}
+                        height={80}
+                        className="w-14 h-14 sm:w-18 sm:h-18 object-contain"
+                        onError={() => setHomeLogoVisible(false)}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <div className="p-4">
-                {/* Header: Team / Spread / Moneyline */}
-                <div className="grid grid-cols-12 gap-2 mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                  <div className="col-span-6">Team</div>
-                  <div className="col-span-3 text-center">Spread</div>
-                  <div className="col-span-3 text-center">Moneyline</div>
-                </div>
-
-                {/* Away Team Row */}
-                <div className="grid grid-cols-12 gap-2 items-center py-3 border-b border-gray-100">
-                  <div className="col-span-6 font-bold text-[#111827] truncate">
-                    {odds.away.name}
+              <div className="px-6 py-5">
+                {/* Second row: team names */}
+                <div className="grid grid-cols-2 text-center border-b border-gray-200 pb-3 mb-4">
+                  <div className="border-r border-gray-200">
+                    <p className="text-sm sm:text-base font-bold uppercase tracking-wider text-[#111827]">
+                      {event.awayTeam} Odds
+                    </p>
                   </div>
-
-                  {/* Spread pill */}
-                  <div className="col-span-3 text-center">
-                    <div className="bg-[#FAFAFA] border border-gray-200 rounded py-2 px-2 hover:border-[#C83495] transition-colors cursor-pointer">
-                      <div className="font-bold text-[#111827]">
-                        {odds.away.spread?.point || "-"}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {odds.away.spread?.price}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Moneyline pill */}
-                  <div className="col-span-3 text-center">
-                    <div className="bg-[#FAFAFA] border border-gray-200 rounded py-2 px-2 hover:border-[#C83495] transition-colors cursor-pointer">
-                      <div className="font-bold text-[#111827]">
-                        {odds.away.ml?.price || "-"}
-                      </div>
-                    </div>
+                  <div>
+                    <p className="text-sm sm:text-base font-bold uppercase tracking-wider text-[#111827]">
+                      {event.homeTeam} Odds
+                    </p>
                   </div>
                 </div>
 
-                {/* Home Team Row */}
-                <div className="grid grid-cols-12 gap-2 items-center py-3">
-                  <div className="col-span-6 font-bold text-[#111827] truncate">
-                    {odds.home.name}
-                  </div>
-
-                  {/* Spread pill */}
-                  <div className="col-span-3 text-center">
-                    <div className="bg-[#FAFAFA] border border-gray-200 rounded py-2 px-2 hover:border-[#C83495] transition-colors cursor-pointer">
-                      <div className="font-bold text-[#111827]">
-                        {odds.home.spread?.point || "-"}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {odds.home.spread?.price}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Moneyline pill */}
-                  <div className="col-span-3 text-center">
-                    <div className="bg-[#FAFAFA] border border-gray-200 rounded py-2 px-2 hover:border-[#C83495] transition-colors cursor-pointer">
-                      <div className="font-bold text-[#111827]">
-                        {odds.home.ml?.price || "-"}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Separate Game Total row (not tied to a team) */}
-                {odds.total && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="flex items-center justify-between text-[11px] uppercase tracking-wider text-gray-500 font-inter mb-1">
-                      <span className="text-left w-full">Game Total</span>
-                      <span className="text-center w-full">Over</span>
-                      <span className="text-right w-full">Under</span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
-                      <span className="text-left w-full">{totalPoint}</span>
-                      <span className="text-center w-full">
-                        {totalPoint}{" "}
-                        <span className="text-xs text-gray-600">
-                          {overPrice}
-                        </span>
+                {/* Third area: Spread / Total / Moneyline per side */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 sm:divide-x divide-gray-200 pt-1">
+                  {/* Away side block */}
+                  <div className="pb-4 sm:pb-0 sm:pr-4 border-b sm:border-b-0 border-gray-200 sm:border-0">
+                    {/* Column headers with bottom border & vertical dividers */}
+                    <div className="flex text-xs sm:text-sm font-bold text-[#111827] uppercase tracking-wider border-b border-gray-100 pb-2 mb-2">
+                      <span className="flex-1 text-left">Spread</span>
+                      <span className="flex-1 text-center border-l border-gray-100">
+                        Total
                       </span>
-                      <span className="text-right w-full">
-                        {totalPoint}{" "}
-                        <span className="text-xs text-gray-600">
-                          {underPrice}
-                        </span>
+                      <span className="flex-1 text-right border-l border-gray-100">
+                        Moneyline
                       </span>
                     </div>
+
+                    {/* Values with vertical dividers */}
+                    <div className="flex items-end text-base sm:text-lg font-semibold text-[#111827] [font-variant-numeric:tabular-nums]">
+                      {/* Spread */}
+                      <div className="flex-1 text-left pr-3">
+                        <div>{odds.away.spread?.point || "-"}</div>
+                        <div className="text-xs sm:text-sm text-gray-500 mt-0.5">
+                          {odds.away.spread?.price || "—"}
+                        </div>
+                      </div>
+
+                      {/* Total */}
+                      <div className="flex-1 text-center px-3 border-l border-gray-100">
+                        <div>{totalPoint}</div>
+                        <div className="text-xs sm:text-sm text-gray-500 mt-0.5">
+                          {totalPriceLabel}
+                        </div>
+                      </div>
+
+                      {/* Moneyline */}
+                      <div className="flex-1 my-auto text-center pl-3 border-l border-gray-100">
+                        <div>{odds.away.ml?.price || "-"}</div>
+                      </div>
+                    </div>
                   </div>
-                )}
+
+                  {/* Home side block */}
+                  <div className="pt-4 sm:pt-0 sm:pl-4">
+                    {/* Column headers with bottom border & vertical dividers */}
+                    <div className="flex text-xs sm:text-sm font-bold text-[#111827] uppercase tracking-wider border-b border-gray-100 pb-2 mb-2">
+                      <span className="flex-1 text-left">Spread</span>
+                      <span className="flex-1 text-center border-l border-gray-100">
+                        Total
+                      </span>
+                      <span className="flex-1 text-right border-l border-gray-100">
+                        Moneyline
+                      </span>
+                    </div>
+
+                    {/* Values with vertical dividers */}
+                    <div className="flex items-end text-base sm:text-lg font-semibold text-[#111827] [font-variant-numeric:tabular-nums]">
+                      {/* Spread */}
+                      <div className="flex-1 text-left pr-3">
+                        <div>{odds.home.spread?.point || "-"}</div>
+                        <div className="text-xs sm:text-sm text-gray-500 mt-0.5">
+                          {odds.home.spread?.price || "—"}
+                        </div>
+                      </div>
+
+                      {/* Total */}
+                      <div className="flex-1 text-center px-3 border-l border-gray-100">
+                        <div>{totalPoint}</div>
+                        <div className="text-xs sm:text-sm text-gray-500 mt-0.5">
+                          {totalPriceLabel}
+                        </div>
+                      </div>
+
+                      {/* Moneyline */}
+                      <div className="flex-1 my-auto text-center pl-3 border-l border-gray-100">
+                        <div>{odds.home.ml?.price || "-"}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom: source / bookmaker */}
+                <div className="mt-6 pt-4 border-t border-gray-200 text-sm text-center text-gray-500">
+                  Odds via{" "}
+                  <span className="font-semibold text-[#25818F]">
+                    {odds.bookmakerName}
+                  </span>
+                  .
+                </div>
               </div>
             </div>
           ) : (
@@ -319,7 +390,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
         {/* Right Column - Sidebar */}
         <aside className="lg:col-span-4">
           {/* Related CMS Articles */}
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden sticky top-4">
+          <div className="bg-white border sticky border-gray-200 rounded-lg overflow-hidden top-20">
             <div className="bg-[#24257C] px-4 py-3">
               <h3 className="text-white font-bold text-sm uppercase tracking-wider">
                 More {event.sportTitle} Articles
@@ -330,7 +401,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                 relatedArticles.slice(0, 6).map((article) => (
                   <Link
                     key={article.id}
-                    href={`/article/${article.slug}`} // adjust to your article route
+                    href={`/article/${article.slug}`}
                     className="flex gap-3 p-4 hover:bg-[#FAFAFA] transition-colors group"
                   >
                     {/* Thumbnail */}
