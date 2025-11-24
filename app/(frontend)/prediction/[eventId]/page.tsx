@@ -78,6 +78,8 @@ const EventPredictionPage = async ({
 
   try {
     // 1) Fetch the main event + predictions + odds
+    const t0 = Date.now();
+
     const eventData = await prisma.oddsEvent.findUnique({
       where: { id: eventId },
       include: {
@@ -93,6 +95,9 @@ const EventPredictionPage = async ({
         eventpredictions: true,
       },
     });
+    console.log("[perf] oddsEvent query ms:", Date.now() - t0);
+
+    //console.log("eventData", eventData);
 
     if (!eventData) {
       return notFound();

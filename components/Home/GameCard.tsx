@@ -132,13 +132,16 @@ export default function GameCard({
   const [homeLogoVisible, setHomeLogoVisible] = useState(true);
 
   const kickoffTs = getKickoffTimestampFromGame(game);
+
+  // ✅ Convert to US Central Time (America/Chicago)
   const kickoffLabel = Number.isFinite(kickoffTs)
-    ? new Date(kickoffTs).toLocaleString(undefined, {
+    ? new Date(kickoffTs).toLocaleString("en-US", {
         weekday: "short",
         month: "short",
         day: "numeric",
         hour: "numeric",
         minute: "2-digit",
+        timeZone: "America/Chicago",
       })
     : ((game as any).kickoffTime as string) ?? "TBD";
 
@@ -163,7 +166,7 @@ export default function GameCard({
           <span className="px-2 py-1 rounded-md bg-gray-50 border border-gray-200 font-medium">
             {game.league}
           </span>
-          <span className="font-medium">{kickoffLabel}</span>
+          <span className="font-medium">{`${kickoffLabel} Central Time`}</span>
         </div>
 
         {/* Teams row */}
@@ -273,12 +276,12 @@ export default function GameCard({
             </div>
 
             <div className="flex items-center justify-between text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
-              <span className="text-left w-full   ">{pointText}</span>
-              <span className="text-center w-full   ">
+              <span className="text-left w-full">{pointText}</span>
+              <span className="text-center w-full">
                 {pointText}{" "}
-                <span className="text-xs text-gray-600 ">{overText}</span>
+                <span className="text-xs text-gray-600">{overText}</span>
               </span>
-              <span className="text-right w-full   ">
+              <span className="text-right w-full">
                 {pointText}{" "}
                 <span className="text-xs text-gray-600">{underText}</span>
               </span>

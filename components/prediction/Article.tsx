@@ -119,22 +119,27 @@ const getBestOdds = (event: DetailEvent): NormalizedOdds | null => {
 
 const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
   const kickoffDate = new Date(event.commenceTime);
+  console.log(
+    "event commence time before central conversion",
+    event.commenceTime
+  );
 
-  // Always show US (ET) time
-  const kickoffDateET = new Intl.DateTimeFormat("en-US", {
+  // Always show US Central Time
+  const kickoffDateCT = new Intl.DateTimeFormat("en-US", {
     weekday: "short",
     month: "short",
     day: "numeric",
-    timeZone: "America/New_York",
+    timeZone: "America/Chicago",
   }).format(kickoffDate);
 
-  const kickoffTimeET = new Intl.DateTimeFormat("en-US", {
+  const kickoffTimeCT = new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
     minute: "2-digit",
-    timeZone: "America/New_York",
+    timeZone: "America/Chicago",
   }).format(kickoffDate);
 
-  const kickoffLabel = `${kickoffDateET} • ${kickoffTimeET} ET`;
+  const kickoffLabel = `${kickoffDateCT} • ${kickoffTimeCT} Central Time`;
+  console.log("event commence time after central conversion", kickoffLabel);
 
   const odds = useMemo(() => getBestOdds(event), [event]);
 
@@ -208,7 +213,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
           {/* Odds Card */}
           {odds ? (
             <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mb-8">
-              {/* Top row: logos + time (US / ET) */}
+              {/* Top row: logos + time (US Central) */}
               <div className="px-6 py-5 border-b border-gray-200 bg-[#FAFAFA] flex items-center justify-between">
                 {/* Away logo */}
                 <div className="flex-1 flex justify-start">
@@ -229,10 +234,10 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                 {/* Center: kickoff info */}
                 <div className="flex-1 text-center px-2 border-x border-gray-200">
                   <p className="text-base sm:text-lg font-bold text-[#111827]">
-                    {kickoffDateET}
+                    {kickoffDateCT}
                   </p>
                   <p className="text-sm sm:text-base font-semibold text-[#111827]">
-                    {kickoffTimeET} ET
+                    {kickoffTimeCT} CT
                   </p>
                   <p className="mt-1 text-xs sm:text-sm font-semibold uppercase tracking-wider text-gray-500">
                     {event.sportTitle}
