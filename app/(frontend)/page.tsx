@@ -1,100 +1,57 @@
 // app/(frontend)/page.tsx
+import { Suspense } from "react";
 import HomeHero from "@/components/Home/HomeHero";
-import UpcomingGames from "@/components/Home/UpcomingGames";
+import FetchUpcomingGamesSection from "@/components/Home/FetchUpcomingGames";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-const LEAGUES = ["NFL", "NBA", "NCAAF", "NCAAB", "MLB", "MMA"] as const;
+// Simple skeleton while UpcomingGamesSection is loading
+function UpcomingGamesSkeleton() {
+  return (
+    <section id="upcoming" className="w-full bg-white py-16 sm:py-20">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-8 sm:mb-12">
+          <div className="h-8 w-48 bg-gray-200 rounded mb-3 animate-pulse" />
+          <div className="h-4 w-72 bg-gray-200 rounded animate-pulse" />
+        </div>
+
+        {/* Skeleton cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-32 sm:h-40 rounded-xl border border-gray-200 bg-gray-50 animate-pulse"
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default async function Home() {
-  const now = new Date();
+  // ----- ARTICLES (featured) -----
+  const t0 = Date.now();
+  const articles = await prisma.article.findMany({
+    where: { isFeatured: true },
+    orderBy: { publishedAt: "desc" },
+    take: 3,
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      description: true,
+      thumbnail: true,
+      publishedAt: true,
+      isFeatured: true,
+      published: true,
+      league: true,
+    },
+  });
+  console.log("Time taken to fetch articles:", Date.now() - t0);
 
-  const tStart = Date.now();
-
-  // 🚀 Run Articles + Events Fetch in PARALLEL
-  const [articles, eventsByLeague] = await Promise.all([
-    // --------- ARTICLES QUERY ----------
-    (async () => {
-      const t0 = Date.now();
-      const res = await prisma.article.findMany({
-        where: { isFeatured: true },
-        orderBy: { publishedAt: "desc" },
-        take: 3,
-        select: {
-          id: true,
-          slug: true,
-          title: true,
-          description: true,
-          thumbnail: true,
-          publishedAt: true,
-          isFeatured: true,
-          published: true,
-          league: true,
-        },
-      });
-      console.log("Time taken to fetch articles:", Date.now() - t0);
-      return res;
-    })(),
-
-    // --------- EVENTS QUERY (league-wise) ----------
-    (async () => {
-      const t1 = Date.now();
-
-      const perLeague = await Promise.all(
-        LEAGUES.map((league) =>
-          prisma.oddsEvent.findMany({
-            where: {
-              sportTitle: league,
-              commenceTime: { gte: now },
-            },
-            orderBy: { commenceTime: "asc" },
-            take: 6, // 6 upcoming events per league
-            select: {
-              id: true,
-              sportKey: true,
-              sportTitle: true,
-              commenceTime: true,
-              homeTeam: true,
-              awayTeam: true,
-              bookmakers: {
-                take: 3,
-                select: {
-                  id: true,
-                  key: true,
-                  title: true,
-                  lastUpdate: true,
-                  markets: {
-                    where: {
-                      key: { in: ["h2h", "spreads", "totals"] }, // only needed markets
-                    },
-                    select: {
-                      id: true,
-                      key: true,
-                      lastUpdate: true,
-                      outcomes: {
-                        select: {
-                          id: true,
-                          name: true,
-                          price: true,
-                          point: true,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          })
-        )
-      );
-
-      console.log("Time taken to fetch events:", Date.now() - t1);
-      return perLeague;
-    })(),
-  ]);
-
-  // Shape articles for component
   const initialFeatured = articles.map((a) => ({
     id: a.id,
     slug: a.slug,
@@ -107,43 +64,16 @@ export default async function Home() {
     league: a.league,
   }));
 
-  // Flatten events (~36)
-  const dbEvents = eventsByLeague.flat();
-
-  // Shape events for UpcomingGames
-  const events = dbEvents.map((e) => ({
-    id: e.id,
-    sportKey: e.sportKey,
-    sportTitle: e.sportTitle,
-    commenceTime: e.commenceTime.toISOString(),
-    homeTeam: e.homeTeam,
-    awayTeam: e.awayTeam,
-    bookmakers: e.bookmakers.map((b) => ({
-      id: b.id,
-      key: b.key,
-      title: b.title,
-      lastUpdate: b.lastUpdate.toISOString(),
-      markets: b.markets.map((m) => ({
-        id: m.id,
-        key: m.key,
-        lastUpdate: m.lastUpdate.toISOString(),
-        outcomes: m.outcomes.map((o) => ({
-          id: o.id,
-          name: o.name,
-          price: o.price,
-          point: o.point ?? null,
-        })),
-      })),
-    })),
-  }));
-
-  console.log("Total events returned:", events.length);
-  console.log("TOTAL server load time:", Date.now() - tStart);
-
   return (
     <main>
+      {/* Hero renders immediately */}
       <HomeHero initialFeatured={initialFeatured} />
-      <UpcomingGames events={events} />
+
+      {/* Upcoming games streamed separately; hero isn't blocked by events */}
+      <Suspense fallback={<UpcomingGamesSkeleton />}>
+        <FetchUpcomingGamesSection />
+      </Suspense>
+
       <div className="h-20" />
     </main>
   );

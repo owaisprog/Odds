@@ -85,7 +85,7 @@ const EventPredictionPage = async ({
         homeTeam: true,
         awayTeam: true,
         bookmakers: {
-          take: 3,
+          take: 1,
           select: {
             id: true,
             title: true,
@@ -118,6 +118,7 @@ const EventPredictionPage = async ({
         },
       },
     });
+    console.log(eventData);
 
     console.log("[perf] oddsEvent query ms:", Date.now() - t0);
     //console.log("[perf] eventData:", eventData);
@@ -175,6 +176,7 @@ const EventPredictionPage = async ({
       commenceTime: eventData.commenceTime.toISOString(),
       // bookmakers + eventpredictions are already in the exact shape of DetailBookmaker/DetailPrediction
     };
+    console.log("[perf] formattedEventData:", formattedEventData);
 
     // 4) Format related articles (convert Date -> string)
     const formattedRelatedArticles: RelatedArticle[] = relatedArticlesRaw.map(
