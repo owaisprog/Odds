@@ -173,7 +173,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
           <li className="text-gray-400">/</li>
           <li>
             <Link
-              href={`/${event.sportKey}`}
+              href={`/league/${event.sportTitle.toLowerCase()}`}
               className="hover:text-[#C83495] transition-colors"
             >
               {event.sportTitle}
