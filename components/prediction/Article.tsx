@@ -1,27 +1,127 @@
 // components/prediction/Article.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-// Imports matching your page.tsx types
 import type {
-  DetailEvent,
+  DetailOutcome,
   DetailPrediction,
+  DetailEvent,
+  DetailBookmaker,
+  DetailMarket,
   RelatedArticle,
-  OptimizedOdds,
-} from "@/app/(frontend)/prediction/[eventId]/page";
+} from "@app/(frontend)/prediction/[eventId]/page";
 
 type ArticleProps = {
   event: DetailEvent;
-  odds: OptimizedOdds; // Receiving the pre-calculated odds from Server
   relatedArticles?: RelatedArticle[];
 };
 
-const Article = ({ event, odds, relatedArticles = [] }: ArticleProps) => {
-  // 1. Date Formatting
+type NormalizedOdds = {
+  bookmakerName: string;
+  home: {
+    name: string;
+    spread?: { point: string; price: string };
+    ml?: { price: string };
+  };
+  away: {
+    name: string;
+    spread?: { point: string; price: string };
+    ml?: { price: string };
+  };
+  total?: {
+    over?: { point: string; price: string };
+    under?: { point: string; price: string };
+  };
+};
+
+const getBestOdds = (event: DetailEvent): NormalizedOdds | null => {
+  if (!event.bookmakers || event.bookmakers.length === 0) return null;
+  const requiredMarkets = ["spreads", "h2h", "totals"];
+
+  // Find a bookmaker that has all 3 markets, or fallback to the first one
+  const bestBookmaker: DetailBookmaker =
+    event.bookmakers.find((book) => {
+      const availableKeys = book.markets.map((m) => m.key);
+      return requiredMarkets.every((k) => availableKeys.includes(k));
+    }) || event.bookmakers[0];
+
+  if (!bestBookmaker) return null;
+
+  const spreadMarket = bestBookmaker.markets.find((m) => m.key === "spreads");
+  const mlMarket = bestBookmaker.markets.find((m) => m.key === "h2h");
+  const totalMarket = bestBookmaker.markets.find((m) => m.key === "totals");
+
+  const getOutcome = (market: DetailMarket | undefined, name: string) =>
+    market?.outcomes.find((o) => o.name === name || name.includes(o.name));
+  const getTotal = (type: "Over" | "Under") =>
+    totalMarket?.outcomes.find((o) => o.name.includes(type));
+  const fmtPrice = (price: number) => (price > 0 ? `+${price}` : `${price}`);
+
+  return {
+    bookmakerName: bestBookmaker.title,
+    home: {
+      name: event.homeTeam,
+      spread: (() => {
+        const o = getOutcome(spreadMarket, event.homeTeam);
+        return o
+          ? {
+              point: o.point
+                ? o.point > 0
+                  ? `+${o.point}`
+                  : `${o.point}`
+                : "",
+              price: fmtPrice(o.price),
+            }
+          : undefined;
+      })(),
+      ml: (() => {
+        const o = getOutcome(mlMarket, event.homeTeam);
+        return o ? { price: fmtPrice(o.price) } : undefined;
+      })(),
+    },
+    away: {
+      name: event.awayTeam,
+      spread: (() => {
+        const o = getOutcome(spreadMarket, event.awayTeam);
+        return o
+          ? {
+              point: o.point
+                ? o.point > 0
+                  ? `+${o.point}`
+                  : `${o.point}`
+                : "",
+              price: fmtPrice(o.price),
+            }
+          : undefined;
+      })(),
+      ml: (() => {
+        const o = getOutcome(mlMarket, event.awayTeam);
+        return o ? { price: fmtPrice(o.price) } : undefined;
+      })(),
+    },
+    total: {
+      over: (() => {
+        const o = getTotal("Over");
+        return o
+          ? { point: `O ${o.point}`, price: fmtPrice(o.price) }
+          : undefined;
+      })(),
+      under: (() => {
+        const o = getTotal("Under");
+        return o
+          ? { point: `U ${o.point}`, price: fmtPrice(o.price) }
+          : undefined;
+      })(),
+    },
+  };
+};
+
+const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
   const kickoffDate = new Date(event.commenceTime);
 
+  // Always show US Central Time
   const kickoffDateCT = new Intl.DateTimeFormat("en-US", {
     weekday: "short",
     month: "short",
@@ -37,22 +137,20 @@ const Article = ({ event, odds, relatedArticles = [] }: ArticleProps) => {
 
   const kickoffLabel = `${kickoffDateCT} • ${kickoffTimeCT} Central Time`;
 
-  // 2. State & Helpers
+  const odds = useMemo(() => getBestOdds(event), [event]);
+
+  // Logo visibility (same pattern as GameCard, but using local event data)
   const [awayLogoVisible, setAwayLogoVisible] = useState(true);
   const [homeLogoVisible, setHomeLogoVisible] = useState(true);
   const leagueFolder = event.sportTitle; // e.g. "NFL", "NBA"
 
-  // 3. Derived Odds Logic
-  const hasOdds = odds.bookmakerName !== null;
-
+  // Totals
   const totalPoint =
     odds?.total?.over?.point?.replace(/^O\s*/, "") ??
     odds?.total?.under?.point?.replace(/^U\s*/, "") ??
     "—";
-
   const overPrice = odds?.total?.over?.price ?? "—";
   const underPrice = odds?.total?.under?.price ?? "—";
-
   const totalPriceLabel =
     overPrice === "—" && underPrice === "—"
       ? "—"
@@ -108,7 +206,7 @@ const Article = ({ event, odds, relatedArticles = [] }: ArticleProps) => {
             </p>
           </header>
 
-          {/* Hero Image */}
+          {/* 🔥 Hero image from OddsEvent.image (Cloudinary) */}
           {event.image && event.image.trim().length > 0 && (
             <div className="mb-8">
               <div className="relative w-full h-56 sm:h-72 md:h-80 lg:h-96 rounded-2xl overflow-hidden bg-gray-100">
@@ -124,7 +222,7 @@ const Article = ({ event, odds, relatedArticles = [] }: ArticleProps) => {
           )}
 
           {/* Odds Card */}
-          {hasOdds ? (
+          {odds ? (
             <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mb-8">
               {/* Top row: logos + time (US Central) */}
               <div className="px-6 py-5 border-b border-gray-200 bg-[#FAFAFA] flex items-center justify-between">
@@ -288,7 +386,6 @@ const Article = ({ event, odds, relatedArticles = [] }: ArticleProps) => {
 
           {/* Predictions / Analysis Section */}
           <section className="mb-8">
-            {/* Direct mapping since data is already limited to 1 on server */}
             {event.eventpredictions.map(
               (prediction: DetailPrediction, idx: number) => (
                 <div key={idx} className="mb-8">
