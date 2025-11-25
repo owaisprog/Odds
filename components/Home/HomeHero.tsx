@@ -13,18 +13,17 @@ type FeaturedArticle = {
   description: string;
   thumbnail: string | null;
   league: "NFL" | "NBA" | "NCAAF" | "NCAAB" | "MLB" | "UFC";
-  publishedAt: string;
-  isFeatured: boolean;
+
   published: boolean;
 };
 
-type HeroProps = { initialFeatured?: FeaturedArticle[] };
+type HeroProps = { articles?: FeaturedArticle[] };
 
-export default function Hero({ initialFeatured = [] }: HeroProps) {
-  const [featured, setFeatured] = useState<FeaturedArticle[]>(initialFeatured);
+export default function Hero({ articles = [] }: HeroProps) {
+  const [featured, setFeatured] = useState<FeaturedArticle[]>(articles);
   const [error, setError] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(initialFeatured.length === 0);
+  const [loading, setLoading] = useState(articles.length === 0);
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const ROTATE_MS = 7000;
@@ -33,7 +32,7 @@ export default function Hero({ initialFeatured = [] }: HeroProps) {
     let isMounted = true;
     (async () => {
       try {
-        if (initialFeatured.length === 0) setLoading(true);
+        if (articles.length === 0) setLoading(true);
         const res = await fetch("/api/getFeaturedBlogs", { cache: "no-cache" });
         if (!res.ok) {
           const body = await res.json().catch(() => null);

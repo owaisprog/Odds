@@ -1,5 +1,3 @@
-// components/Home/UpcomingGamesSection.tsx
-
 import UpcomingGames from "./UpcomingGames";
 import { prisma } from "@/lib/prisma";
 
@@ -9,6 +7,7 @@ export default async function FetchUpcomingGamesSection() {
   const now = new Date();
   const t1 = Date.now();
 
+  // Fetch events per league directly without flattening
   const perLeague = await Promise.all(
     LEAGUES.map((league) =>
       prisma.oddsEvent.findMany({
@@ -17,12 +16,12 @@ export default async function FetchUpcomingGamesSection() {
           commenceTime: { gte: now },
         },
         orderBy: { commenceTime: "asc" },
-        take: 6, // 6 upcoming events per league
+        take: 6, // Limit to 6 events per league
         select: {
           id: true,
           sportKey: true,
           sportTitle: true,
-          commenceTime: true,
+          commenceTime: true, // Keep as Date
           homeTeam: true,
           awayTeam: true,
           bookmakers: {
@@ -31,15 +30,15 @@ export default async function FetchUpcomingGamesSection() {
               id: true,
               key: true,
               title: true,
-              lastUpdate: true,
+              lastUpdate: true, // Keep as Date
               markets: {
                 where: {
-                  key: { in: ["h2h", "spreads", "totals"] }, // only needed markets
+                  key: { in: ["h2h", "spreads", "totals"] }, // Only needed markets
                 },
                 select: {
                   id: true,
                   key: true,
-                  lastUpdate: true,
+                  lastUpdate: true, // Keep as Date
                   outcomes: {
                     select: {
                       id: true,
@@ -57,38 +56,8 @@ export default async function FetchUpcomingGamesSection() {
     )
   );
 
-  console.log("Time taken to fetch events (home):", Date.now() - t1);
-
+  // Flatten perLeague array properly and ensure it's a DbOddsEvent[]
   const dbEvents = perLeague.flat();
-
-  // Shape to the DbOddsEvent type that UpcomingGames expects (string dates)
-  const events = dbEvents.map((e) => ({
-    id: e.id,
-    sportKey: e.sportKey,
-    sportTitle: e.sportTitle,
-    commenceTime: e.commenceTime.toISOString(),
-    homeTeam: e.homeTeam,
-    awayTeam: e.awayTeam,
-    bookmakers: e.bookmakers.map((b) => ({
-      id: b.id,
-      key: b.key,
-      title: b.title,
-      lastUpdate: b.lastUpdate.toISOString(),
-      markets: b.markets.map((m) => ({
-        id: m.id,
-        key: m.key,
-        lastUpdate: m.lastUpdate.toISOString(),
-        outcomes: m.outcomes.map((o) => ({
-          id: o.id,
-          name: o.name,
-          price: o.price,
-          point: o.point ?? null,
-        })),
-      })),
-    })),
-  }));
-
-  console.log("Total events returned (home):", events.length);
-
-  return <UpcomingGames events={events} />;
+  // Pass dbEvents directly to UpcomingGames without flattening or re-shaping
+  return <UpcomingGames events={dbEvents} />;
 }

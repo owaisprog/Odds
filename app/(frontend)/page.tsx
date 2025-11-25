@@ -44,30 +44,16 @@ export default async function Home() {
       title: true,
       description: true,
       thumbnail: true,
-      publishedAt: true,
-      isFeatured: true,
+
       published: true,
       league: true,
     },
   });
-  console.log("Time taken to fetch articles:", Date.now() - t0);
-
-  const initialFeatured = articles.map((a) => ({
-    id: a.id,
-    slug: a.slug,
-    title: a.title,
-    description: a.description,
-    thumbnail: a.thumbnail,
-    publishedAt: a.publishedAt.toISOString(),
-    isFeatured: !!a.isFeatured,
-    published: !!a.published,
-    league: a.league,
-  }));
 
   return (
     <main>
       {/* Hero renders immediately */}
-      <HomeHero initialFeatured={initialFeatured} />
+      <HomeHero articles={articles} />
 
       {/* Upcoming games streamed separately; hero isn't blocked by events */}
       <Suspense fallback={<UpcomingGamesSkeleton />}>

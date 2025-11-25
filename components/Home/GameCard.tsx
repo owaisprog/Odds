@@ -152,7 +152,6 @@ export default function GameCard({
 
   // If parent didn't pass a href, default to the dynamic league route
   const href = predictionHref ?? `/prediction/${game.id}`;
-
   return (
     <div
       className={`group bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#24257C] ${className}`}
