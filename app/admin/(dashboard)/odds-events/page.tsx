@@ -1,4 +1,3 @@
-// app/admin/(dashboard)/odds-events/page.tsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -28,6 +27,7 @@ export default function AdminOddsEventsPage() {
 
   const [leagueFilter, setLeagueFilter] = useState<LeagueFilter>("ALL");
   const [uploadingIds, setUploadingIds] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Cloudinary env vars (same style as your EditBlog page)
   const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? "";
@@ -82,9 +82,23 @@ export default function AdminOddsEventsPage() {
 
   // filtered by league
   const filteredEvents = useMemo(() => {
-    if (leagueFilter === "ALL") return events;
-    return events.filter((e) => e.sportTitle === leagueFilter);
-  }, [events, leagueFilter]);
+    const lowerCaseSearchQuery = searchQuery.toLowerCase();
+
+    // Filter based on league
+    const leagueFilteredEvents =
+      leagueFilter === "ALL"
+        ? events
+        : events.filter((e) => e.sportTitle === leagueFilter);
+
+    // Further filter by search query in homeTeam or awayTeam
+    const searchedEvents = leagueFilteredEvents.filter(
+      (e) =>
+        e.homeTeam.toLowerCase().includes(lowerCaseSearchQuery) ||
+        e.awayTeam.toLowerCase().includes(lowerCaseSearchQuery)
+    );
+
+    return searchedEvents;
+  }, [events, leagueFilter, searchQuery]);
 
   const truncate = (str: string, max = 80) =>
     str.length > max ? str.slice(0, max) + "…" : str;
@@ -174,11 +188,25 @@ export default function AdminOddsEventsPage() {
         the <code>image</code> field.
       </p>
 
+      {/* Search Bar */}
+      <div className="mb-8">
+        <label className="block text-sm font-poppins text-gray-700 mb-2">
+          Search by Team Names
+        </label>
+        <input
+          type="text"
+          placeholder="Enter team name"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full font-poppins pl-1 py-3 border-2 border-gray-200 rounded-lg"
+        />
+      </div>
+
       {/* League filter */}
-      <div className="flex flex-col md:flex-row md:items-end gap-4 mb-8 ">
+      <div className="flex flex-col md:flex-row md:items-end gap-4 mb-8">
         <div className="w-full sm:w-63">
           <label className="block text-sm font-poppins text-gray-700 mb-2">
-            Filter by League (sportTitle)
+            Filter by League
           </label>
           <select
             value={leagueFilter}
@@ -290,8 +318,6 @@ export default function AdminOddsEventsPage() {
     </div>
   );
 }
-
-/* --------------------- UI helpers --------------------- */
 
 function Spinner({ tiny = false }: { tiny?: boolean }) {
   const size = tiny ? "h-4 w-4" : "h-6 w-6";

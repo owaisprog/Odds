@@ -25,11 +25,6 @@ const NAV_ITEMS: NavItem[] = [
     label: "Odds Events",
     icon: <RiDashboardFill className="w-6 h-6" />,
   },
-  {
-    href: "/admin/contact",
-    label: "Contact",
-    icon: <MdMessage className="w-6 h-6" />,
-  },
 ];
 
 export default function AdminSidebar() {
