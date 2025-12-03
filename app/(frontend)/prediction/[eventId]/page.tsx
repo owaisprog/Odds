@@ -131,7 +131,7 @@ const EventPredictionPage = async ({
       "NCAAF",
       "NCAAB",
       "MLB",
-      "MMA",
+      "UFC",
     ] as const;
 
     let relatedArticlesRaw: {

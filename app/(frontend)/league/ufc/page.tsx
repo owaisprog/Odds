@@ -77,15 +77,6 @@ export default async function UFCLeaguePage() {
     <div className="w-full bg-[#FAFAFA] min-h-screen">
       <section className="w-full bg-[#FAFAFA] py-12 sm:py-16">
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
-          <div className="mb-8 sm:mb-12">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight font-playfair">
-              MMA — All Upcoming Events
-            </h1>
-            <p className="mt-2 text-base sm:text-lg text-gray-600 font-inter">
-              Complete schedule and odds
-            </p>
-          </div>
-
           {/* Client component: search/filter + render with GameCard */}
           <LeagueEventsUFC events={events} />
         </div>

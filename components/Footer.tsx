@@ -9,12 +9,12 @@ export default function Footer() {
       {/* Brand accent line */}
       <div className="h-1 w-full bg-gradient-to-r from-[#24257C] via-[#C83495] to-[#24257C]" />
 
-      <div className="mx-auto container px-4 sm:px-6 lg:px-8 py-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Main footer content */}
-        <div className="md:flex justify-between px-5">
+        <div className="md:flex justify-between px-5 gap-12">
           {/* Brand Section */}
-          <div className="lg:col-span-5 flex flex-col gap-6 ">
-            <div className="flex items-center gap-3">
+          <div className="lg:col-span-5 flex flex-col gap-6 max-w-lg">
+            <div className="flex  items-center gap-3">
               <Image
                 src="/WebLogo.png"
                 alt="DGenSports"
@@ -24,7 +24,7 @@ export default function Footer() {
                 className="block h-auto w-auto -mt-15"
               />
             </div>
-            <p className="text-white/70 leading-relaxed text-base max-w-md">
+            <p className="text-white/70 leading-relaxed text-base">
               Real data. Real analysis. Updated daily. DGenSports delivers
               concise breakdowns and odds you can scan fast—no fluff, just
               signal.
@@ -51,36 +51,16 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Major Leagues */}
-          <div className="lg:col-span-2 flex flex-col gap-6 mt-5 md:mt-0">
+          {/* Leagues (combined column) */}
+          <div className="lg:col-span-3 flex flex-col gap-6 mt-10 md:mt-0 min-w-[180px]">
             <h3 className="text-lg font-bold text-white uppercase tracking-wider">
-              Major Leagues
+              Leagues
             </h3>
             <ul className="space-y-4">
               {[
                 { label: "NFL", href: "/league/nfl" },
                 { label: "NBA", href: "/league/nba" },
                 { label: "MLB", href: "/league/mlb" },
-              ].map((l) => (
-                <li key={l.href}>
-                  <Link
-                    href={l.href}
-                    className="text-white/70 hover:text-[#C83495] hover:translate-x-1 transition-all duration-200 inline-block font-medium"
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* College & Combat Sports */}
-          <div className="lg:col-span-3 flex flex-col gap-6 mt-5 md:mt-0">
-            <h3 className="text-lg font-bold text-white uppercase tracking-wider">
-              More Sports
-            </h3>
-            <ul className="space-y-4">
-              {[
                 { label: "NCAAF", href: "/league/ncaaf" },
                 { label: "NCAAB", href: "/league/ncaab" },
                 { label: "UFC", href: "/league/ufc" },

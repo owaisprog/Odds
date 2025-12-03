@@ -290,11 +290,11 @@ export default function UpcomingGames({ events }: Props) {
         {/* --- Header Section --- */}
         <div className="mb-8 sm:mb-12 grid gap-4 sm:gap-6 md:grid-cols-[1fr_auto_auto] md:items-end">
           <div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight font-playfair">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-800 tracking-tight font-playfair">
               Upcoming Games
             </h2>
-            <p className="mt-2 text-base sm:text-lg text-gray-600 font-inter">
-              Spread • Total • Moneyline for upcoming matchups
+            <p className="mt-2 text-base sm:text-lg text-slate-600 font-inter">
+              Lines, Prices and total for every game this week.
             </p>
           </div>
 
