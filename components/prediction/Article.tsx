@@ -412,11 +412,11 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                   </p>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-8   mr-2">
+                  <div className="   mr-2">
                     {event.sportTitle !== "MMA" && (
                       <Image
                         src={`/${event.sportTitle}/${event.awayTeam}.png`}
-                        alt={`${event.awayTeam} logo`}
+                        alt={`${event.homeTeam} logo`}
                         width={32}
                         height={32}
                         className="object-contain"
