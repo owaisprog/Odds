@@ -204,7 +204,7 @@ const LeagueLogos = {
   ),
   UFC: () => (
     <Image
-      src="/mma.png"
+      src="/MMA/mma.png"
       alt="UFC"
       width={30}
       height={30}

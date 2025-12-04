@@ -389,14 +389,16 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                 <div className="flex items-center  mb-4">
                   {/* Home team logo */}
                   <div className="  h-full   mr-2">
-                    <Image
-                      src={`/${event.sportTitle}/${event.homeTeam}.png`}
-                      alt={`${event.homeTeam} logo`}
-                      width={32}
-                      height={32}
-                      className="object-contain"
-                      onError={() => setHomeLogoVisible(false)} // Ensures no error if logo fails to load
-                    />
+                    {event.sportTitle !== "MMA" && (
+                      <Image
+                        src={`/${event.sportTitle}/${event.homeTeam}.png`}
+                        alt={`${event.homeTeam} logo`}
+                        width={32}
+                        height={32}
+                        className="object-contain"
+                        onError={() => setHomeLogoVisible(false)} // Ensures no error if logo fails to load
+                      />
+                    )}
                   </div>
                   {/* Article heading */}
                   <h2 className="font-gtsuper  text-2xl sm:text-3xl font-bold text-[#111827]  pb-2 ">
@@ -411,14 +413,16 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                 </div>
                 <div className="flex items-center">
                   <div className="w-8   mr-2">
-                    <Image
-                      src={`/${event.sportTitle}/${event.awayTeam}.png`}
-                      alt={`${event.awayTeam} logo`}
-                      width={32}
-                      height={32}
-                      className="object-contain"
-                      onError={() => setAwayLogoVisible(false)} // Ensures no error if logo fails to load
-                    />
+                    {event.sportTitle !== "MMA" && (
+                      <Image
+                        src={`/${event.sportTitle}/${event.awayTeam}.png`}
+                        alt={`${event.awayTeam} logo`}
+                        width={32}
+                        height={32}
+                        className="object-contain"
+                        onError={() => setAwayLogoVisible(false)} // Ensures no error if logo fails to load
+                      />
+                    )}
                   </div>
                   <h2 className="font-gtsuper text-2xl mt-4 sm:text-3xl font-gtsuper font-bold text-[#111827]  pb-2">
                     {prediction.article2Heading}
