@@ -54,11 +54,11 @@ const LeagueLogos = {
   ),
   UFC: () => (
     <Image
-      src="/UFC/ufc.png"
+      src="/MMA/mma.png"
       alt="UFC"
       width={30}
       height={30}
-      className="w-7 h-7"
+      className="w-5 h-3"
     />
   ),
 };
@@ -115,7 +115,7 @@ function NavBar() {
   }, [mobileMenuOpen]);
 
   return (
-    <nav className="w-full bg-white border-b border-gray-200 sticky top-0 z-50 shadow-md font-inter">
+    <nav className="w-full bg-white border-b border-gray-200 sticky top-0 z-50 shadow-md ">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
@@ -128,7 +128,7 @@ function NavBar() {
             {/* Home Link */}
             <Link
               href="/"
-              className="text-[#111827] font-medium text-base hover:text-[#278394] transition-colors duration-300 relative group"
+              className="text-[#111827] font-neue font-bold text-base hover:text-[#278394] transition-colors duration-300 relative group"
             >
               Home
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#278394] transition-all duration-300 group-hover:w-full" />
@@ -156,11 +156,11 @@ function NavBar() {
                     setDeskLeagueOpen((v) => !v);
                   }
                 }}
-                className="flex cursor-pointer items-center gap-2 text-[#111827] font-medium text-base hover:text-[#278394] transition-colors duration-300 relative group"
+                className="flex cursor-pointer items-center gap-2 text-[#111827] font-neue font-bold text-base hover:text-[#278394] transition-colors duration-300 relative group"
               >
                 Leagues
                 {deskLeagueOpen ? (
-                  <FiChevronUp className="w-4 h-4" />
+                  <FiChevronUp className="w-4 h-4 " />
                 ) : (
                   <FiChevronDown className="w-4 h-4" />
                 )}
@@ -180,7 +180,7 @@ function NavBar() {
                         href={league.href}
                         role="menuitem"
                         onClick={() => setDeskLeagueOpen(false)} // close after click
-                        className="flex items-center gap-3 px-4 py-3 text-[#111827] font-medium hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
+                        className="flex items-center gap-3 px-4 py-3 text-[#111827] font-neue font-bold hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
                       >
                         <LogoComponent />
                         <span>{league.label}</span>
@@ -230,7 +230,7 @@ function NavBar() {
             <Link
               href="/"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-4 py-3 text-[#111827] font-medium hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
+              className="block px-4 py-3 text-[#111827] font-neue font-bold hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
             >
               Home
             </Link>
@@ -240,7 +240,7 @@ function NavBar() {
               <button
                 onClick={() => setMobileLeagueOpen((v) => !v)}
                 aria-expanded={mobileLeagueOpen}
-                className="w-full flex items-center justify-between px-4 py-3 text-[#111827] font-medium hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
+                className="w-full flex items-center justify-between px-4 py-3 text-[#111827] font-neue font-bold hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
               >
                 <span>League</span>
                 {mobileLeagueOpen ? (
@@ -262,7 +262,7 @@ function NavBar() {
                           setMobileLeagueOpen(false);
                           setMobileMenuOpen(false);
                         }}
-                        className="flex items-center gap-3 pl-8 pr-4 py-3 text-[#111827] font-medium hover:bg-gray-100 hover:text-[#278394] transition-colors duration-200"
+                        className="flex items-center gap-3 pl-8 pr-4 py-3 text-[#111827] font-neue font-medium hover:bg-gray-100 hover:text-[#278394] transition-colors duration-200"
                       >
                         <LogoComponent />
                         <span>{league.label}</span>

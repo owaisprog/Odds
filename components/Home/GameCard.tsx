@@ -29,6 +29,25 @@ type GameCardGame = {
   };
 };
 
+function getTeamName(team: string, league: string): string {
+  // List of leagues to apply the city-removal rule
+  const leaguesWithCityNames = ["NFL", "NBA", "NCAAF", "NCAAB", "MLB"];
+
+  // If the league requires city name removal (NFL, NBA, NCAAF, NCAAB, MLB)
+  if (leaguesWithCityNames.includes(league)) {
+    const parts = team.split(" "); // Split the team name by space
+
+    // Check if the team has multiple parts (more than 1 word)
+    if (parts.length > 1) {
+      // Remove the first part (which is usually the city) and return the rest
+      return parts.slice(1).join(" ");
+    }
+  }
+
+  // Return the full team name for other leagues (e.g., MMA)
+  return team;
+}
+
 /** ---------- Helpers (kept local so the card is fully reusable) ---------- */
 function getKickoffTimestampFromGame(game: GameCardGame): number {
   const maybeKickoffTs = (game as any)?.kickoffTs;
@@ -143,7 +162,7 @@ export default function GameCard({
 
   // If parent didn't pass a href, default to the dynamic league route
   const href = predictionHref ?? `/prediction/${game.id}`;
-
+  //console.log(game.league);
   return (
     <div
       className={`group bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#24257C] ${className}`}
@@ -167,7 +186,11 @@ export default function GameCard({
             {awayLogoVisible && (
               <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
                 <Image
-                  src={`/${game.league}/${game.awayTeam.name}.png`}
+                  src={
+                    game.league === "MMA"
+                      ? `/MMA/mma.png`
+                      : `/${game.league}/${game.awayTeam.name}.png`
+                  }
                   alt={`${game.awayTeam.name} logo`}
                   width={44}
                   height={44}
@@ -178,7 +201,7 @@ export default function GameCard({
             )}
             <div className="min-w-0 font-gtsuper">
               <p className="font-semibold  text-[15px] text-[#111827] truncate">
-                {game.awayTeam.name}
+                {getTeamName(game.awayTeam.name, game.league)}
               </p>
               <p className="text-xs text-gray-500 truncate font-neue">Away</p>
             </div>
@@ -195,14 +218,18 @@ export default function GameCard({
           <div className="flex items-center gap-3 flex-1 min-w-0 justify-end">
             <div className="min-w-0 font-gtsuper text-right">
               <p className="font-semibold  text-[15px] text-[#111827] truncate">
-                {game.homeTeam.name}
+                {getTeamName(game.homeTeam.name, game.league)}
               </p>
               <p className="text-xs text-gray-500 truncate font-neue">Home</p>
             </div>
             {homeLogoVisible && (
               <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
                 <Image
-                  src={`/${game.league}/${game.homeTeam.name}.png`}
+                  src={
+                    game.league === "MMA"
+                      ? `/MMA/mma.png`
+                      : `/${game.league}/${game.homeTeam.name}.png`
+                  }
                   alt={`${game.homeTeam.name} logo`}
                   width={44}
                   height={44}
