@@ -549,7 +549,13 @@ async function handler(options?: { prune?: boolean }) {
       events: allData[lg]?.length ?? 0,
     }));
 
-    return { success: true, summary };
+    return Response.json(
+      {
+        success: true,
+        message: "Odds processed successfully",
+      },
+      { status: 200 }
+    );
   } catch (error) {
     const axiosErr = error as AxiosError | Error;
 
@@ -579,13 +585,16 @@ export async function POST() {
   const result = await handler({ prune: true });
 
   return Response.json(result, {
-    status: result.success ? 200 : 500,
+    status: result ? 200 : 500,
   });
 }
 
 export async function GET() {
+  console.log("[CRON] Cron job triggered at", new Date().toISOString());
+
   const result = await handler({ prune: true });
+  console.log("[CRON] Cron job finished at", new Date().toISOString());
   return Response.json(result, {
-    status: result.success ? 200 : 500,
+    status: result ? 200 : 500,
   });
 }
