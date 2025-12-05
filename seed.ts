@@ -1,5 +1,9 @@
 /* prisma/seed.ts */
-import { PrismaClient, League as PrismaLeague, ContentType } from "@prisma/client";
+import {
+  PrismaClient,
+  League as PrismaLeague,
+  ContentType,
+} from "@prisma/client";
 import { blogArticles } from "./dummyData"; // adjust the path if needed
 
 const prisma = new PrismaClient();
@@ -51,8 +55,6 @@ async function main() {
       },
     });
   }
-
-  console.log("Seed complete ✅");
 }
 
 main()

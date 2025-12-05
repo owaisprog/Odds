@@ -48,9 +48,6 @@ export default async function NBALeaguePage() {
     orderBy: { commenceTime: "asc" },
   });
 
-  const t1 = Date.now();
-  console.log("t1 - t0", t1 - t0);
-
   // Serialize dates for client component
   const events: SerializableOddsEvent[] = dbEvents.map((e) => ({
     id: e.id,

@@ -46,7 +46,6 @@ export default async function NCAABLeaguePage() {
     },
     orderBy: { commenceTime: "asc" },
   });
-  console.log("t1 - t0", Date.now() - t0);
   // Serialize dates for client component
   const events: SerializableOddsEvent[] = dbEvents.map((e) => ({
     id: e.id,
