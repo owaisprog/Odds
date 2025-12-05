@@ -24,7 +24,7 @@ interface OddsArticleResponse {
 const todayDaysFromNow = new Date();
 todayDaysFromNow.setDate(todayDaysFromNow.getDate() + 2);
 
-export async function GET(_req: NextRequest) {
+export async function POST(_req: NextRequest) {
   try {
     const events = await prisma.oddsEvent.findMany({
       where: {

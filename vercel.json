@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/sync-odds",
-      "schedule": "55 13 * * *"
+      "schedule": "59 13 * * *"
     }
   ]
 }

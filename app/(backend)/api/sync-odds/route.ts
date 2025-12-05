@@ -575,7 +575,7 @@ async function handler(options?: { prune?: boolean }) {
   }
 }
 
-export async function GET() {
+export async function POST() {
   const result = await handler({ prune: true });
 
   return Response.json(result, {
