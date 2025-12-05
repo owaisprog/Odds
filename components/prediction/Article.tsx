@@ -161,7 +161,10 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
       <nav className="mb-4">
         <ol className="flex items-center gap-2 text-sm text-[#111827]">
           <li>
-            <Link href="/" className="hover:text-[#C83495] transition-colors">
+            <Link
+              href="/"
+              className="hover:text-[#C83495] transition-colors font-semibold font-neue"
+            >
               Home
             </Link>
           </li>
@@ -169,13 +172,13 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
           <li>
             <Link
               href={`/league/${event.sportTitle.toLowerCase()}`}
-              className="hover:text-[#C83495] transition-colors"
+              className="hover:text-[#C83495] font-semibold font-neue transition-colors"
             >
               {event.sportTitle}
             </Link>
           </li>
           <li className="text-gray-400">/</li>
-          <li className="text-[#24257C] font-medium">
+          <li className="text-[#24257C] font-semibold font-neue">
             {event.awayTeam} vs {event.homeTeam}
           </li>
         </ol>
@@ -188,10 +191,10 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
           {/* Article Header */}
           <header className="mb-8">
             <div className="flex items-center gap-3 mb-4">
-              <span className="bg-[#24257C] text-white text-xs sm:text-sm font-bold uppercase tracking-wider px-3 py-1 rounded">
+              <span className="bg-[#24257C] text-white text-xs sm:text-sm font-bold font-neue uppercase tracking-wider px-3 py-1 rounded">
                 {event.sportTitle}
               </span>
-              <span className="text-sm sm:text-base text-[#111827] font-inter">
+              <span className="text-sm sm:text-base text-[#111827] font-neue">
                 {kickoffLabel}
               </span>
             </div>
@@ -241,7 +244,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
 
                 {/* Center: kickoff info */}
                 <div className="flex-1 text-center px-2 border-x border-gray-200">
-                  <p className="text-base sm:text-lg font-bold text-[#111827]">
+                  <p className="text-base sm:text-lg font-bold font-neue text-[#111827]">
                     {kickoffDateCT}
                   </p>
                   <p className="text-sm sm:text-base font-semibold text-[#111827]">
@@ -273,13 +276,13 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                 {/* Second row: team names */}
                 <div className="grid grid-cols-2 text-center border-b border-gray-200 pb-3 mb-4">
                   <div className="border-r border-gray-200">
-                    <p className="text-sm sm:text-base font-bold uppercase tracking-wider text-[#111827]">
-                      {event.awayTeam} Odds
+                    <p className="text-sm sm:text-base font-bold font-gtsuper uppercase tracking-wider text-[#111827]">
+                      {event.awayTeam}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm sm:text-base font-bold uppercase tracking-wider text-[#111827]">
-                      {event.homeTeam} Odds
+                    <p className="text-sm sm:text-base font-gtsuper font-bold uppercase tracking-wider text-[#111827]">
+                      {event.homeTeam}
                     </p>
                   </div>
                 </div>
@@ -289,7 +292,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                   {/* Away side block */}
                   <div className="pb-4 sm:pb-0 sm:pr-4 border-b sm:border-b-0 border-gray-200 sm:border-0">
                     {/* Column headers with bottom border & vertical dividers */}
-                    <div className="flex text-xs sm:text-sm font-bold text-[#111827] uppercase tracking-wider border-b border-gray-100 pb-2 mb-2">
+                    <div className="flex text-xs sm:text-sm font-bold font-neue text-[#111827] uppercase tracking-wider border-b border-gray-100 pb-2 mb-2">
                       <span className="flex-1 text-left">Spread</span>
                       <span className="flex-1 text-center border-l border-gray-100">
                         Total
@@ -327,7 +330,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                   {/* Home side block */}
                   <div className="pt-4 sm:pt-0 sm:pl-4">
                     {/* Column headers with bottom border & vertical dividers */}
-                    <div className="flex text-xs sm:text-sm font-bold text-[#111827] uppercase tracking-wider border-b border-gray-100 pb-2 mb-2">
+                    <div className="flex text-xs sm:text-sm font-neue font-bold text-[#111827] uppercase tracking-wider border-b border-gray-100 pb-2 mb-2">
                       <span className="flex-1 text-left">Spread</span>
                       <span className="flex-1 text-center border-l border-gray-100">
                         Total
@@ -364,7 +367,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                 </div>
 
                 {/* Bottom: source / bookmaker */}
-                <div className="mt-6 pt-4 border-t border-gray-200 text-sm text-center text-gray-500">
+                <div className="mt-6 pt-4 border-t font-neue border-gray-200 text-sm text-center text-gray-500">
                   Odds via{" "}
                   <span className="font-semibold text-[#25818F]">
                     {odds.bookmakerName}
@@ -452,7 +455,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
           {/* Related CMS Articles */}
           <div className="bg-white border sticky border-gray-200 rounded-lg overflow-hidden top-20">
             <div className="bg-[#24257C] px-4 py-3">
-              <h3 className="text-white font-bold text-sm uppercase tracking-wider">
+              <h3 className="text-white font-gtsuper font-bold text-sm uppercase tracking-wider">
                 More {event.sportTitle} Articles
               </h3>
             </div>
@@ -482,13 +485,13 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
 
                     {/* Text */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-semibold text-[#C83495] uppercase tracking-wider mb-1">
+                      <p className="text-[11px] font-semibold text-[#C83495] font-neue uppercase tracking-wider mb-1">
                         {article.league}
                       </p>
-                      <h4 className="font-inter font-bold text-sm text-[#111827] group-hover:text-[#C83495] transition-colors line-clamp-2">
+                      <h4 className="font-gtsuper font-bold text-sm text-[#111827] group-hover:text-[#C83495] transition-colors line-clamp-2">
                         {article.title}
                       </h4>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs font-neue text-gray-500 mt-1">
                         {new Date(article.publishedAt).toLocaleDateString(
                           undefined,
                           {

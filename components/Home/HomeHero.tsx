@@ -191,7 +191,7 @@ export default function Hero({ articles = [] }: HeroProps) {
                 <Link href={hasData ? `/article/${current!.slug}` : `#`}>
                   <button
                     disabled={!hasData}
-                    className="inline-block px-6 py-3 cursor-pointer bg-[#24257C] hover:bg-[#C83495] disabled:opacity-60 disabled:cursor-not-allowed text-white font-gtsuper font-medium rounded transition-colors duration-300"
+                    className="inline-block px-6 py-3 cursor-pointer bg-[#24257C] hover:bg-[#C83495] disabled:opacity-60 disabled:cursor-not-allowed text-white font-neue font-medium rounded transition-colors duration-300"
                   >
                     Read Analysis
                   </button>
