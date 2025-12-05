@@ -1,16 +1,8 @@
 {
   "crons": [
     {
-      "path": "/api/sync-odds",
-      "schedule": "0 * * * *"
-    },
-    {
-      "path": "/api/odds-predection",
-      "schedule": "30 0 * * *"
-    },
-     {
       "path": "/api/cron-test",
-      "schedule": "* * * * *"
+      "schedule": "5 11 * * *"
     }
   ]
 }
