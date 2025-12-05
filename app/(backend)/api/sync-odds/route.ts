@@ -582,3 +582,10 @@ export async function POST() {
     status: result.success ? 200 : 500,
   });
 }
+
+export async function GET() {
+  const result = await handler({ prune: true });
+  return Response.json(result, {
+    status: result.success ? 200 : 500,
+  });
+}
