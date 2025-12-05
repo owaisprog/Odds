@@ -39,9 +39,9 @@ const heroImages: any = {
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764929244/side-view-basket-with-ball-it_jovjde.webp",
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006040/pexels-jimmy-liao-3615017-12602140_nxi1ax.webp",
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006040/m13fwawmke2hz2qansbl_uhzyyc.webp", //color
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006039/athmvh7pt4cpmh6gi8cw_qcvwgm.webp", //color
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006039/fngbkyakqcj9y0zbig9z_yy7cm8.webp", //not general
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006038/e1b869nhhe3kq00vw1ts_ybj9be.webp", //not general
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764929991/360_F_899774739_tgiiMlPrvv648yRJ3oqMDnQKuyBz6cDs_o7n8ao.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764929993/taylor-smith-nYg4BDP86Aw-unsplash_lodt1n.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764929992/wesley-tingey-V3fpPg7aBYI-unsplash_uxxhoo.webp",
   ],
   ncaaf: [
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764045705/male-american-football-player-uniform-field_gmq2to.webp",
