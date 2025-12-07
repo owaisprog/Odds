@@ -8,7 +8,7 @@ async function main() {
   console.log("[CRON] Starting sync-odds cron worker...");
 
   const oddsTask = cron.schedule(
-    "0 * * * *", 
+    "0 * * * *",
     async () => {
       try {
         console.log("[CRON] Hourly job triggered at", new Date().toISOString());
@@ -24,7 +24,7 @@ async function main() {
   );
 
   const predictionTask = cron.schedule(
-    "30 0 * * *", 
+    "30 0 * * *",
     async () => {
       try {
         console.log(

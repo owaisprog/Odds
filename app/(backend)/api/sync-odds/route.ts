@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios";
 import { prisma } from "@/lib/prisma";
 import OpenAI from "openai";
 import { encode } from "@toon-format/toon";
+import { NextResponse } from "next/server";
 
 type LeagueKey = "nfl" | "nba" | "ncaaf" | "ncaab" | "mlb" | "mma";
 
@@ -549,13 +550,12 @@ async function handler(options?: { prune?: boolean }) {
       events: allData[lg]?.length ?? 0,
     }));
 
-    return Response.json(
-      {
-        success: true,
-        message: "Odds processed successfully",
-      },
-      { status: 200 }
-    );
+    return {
+      success: true,
+      status: 200,
+      message: "Odds processed successfully",
+      summary,
+    };
   } catch (error) {
     const axiosErr = error as AxiosError | Error;
 
@@ -581,20 +581,30 @@ async function handler(options?: { prune?: boolean }) {
   }
 }
 
-export async function POST() {
+export async function GET() {
+  const id = Math.random().toString(36).slice(2, 8);
+  console.log(`[CRON] [${id}] Cron job triggered at`, new Date().toISOString());
+
   const result = await handler({ prune: true });
 
-  return Response.json(result, {
-    status: result ? 200 : 500,
-  });
+  console.log(`[CRON] [${id}] Cron job finished at`, new Date().toISOString());
+
+  return Response.json(result);
 }
 
-export async function GET() {
-  console.log("[CRON] Cron job triggered at", new Date().toISOString());
+export async function POST() {
+  const id = Math.random().toString(36).slice(2, 8);
+  console.log(
+    `[MANUAL] [${id}] sync-odds triggered at`,
+    new Date().toISOString()
+  );
 
   const result = await handler({ prune: true });
-  console.log("[CRON] Cron job finished at", new Date().toISOString());
-  return Response.json(result, {
-    status: result ? 200 : 500,
-  });
+
+  console.log(
+    `[MANUAL] [${id}] sync-odds finished at`,
+    new Date().toISOString()
+  );
+
+  return NextResponse.json(result);
 }
