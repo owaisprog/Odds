@@ -35,7 +35,7 @@ export type SerializableOddsEvent = {
 export default async function UFCLeaguePage() {
   // Pull ONLY UFC events from DB
   const dbEvents = await prisma.oddsEvent.findMany({
-    where: { sportTitle: "MMA" },
+    where: { sportTitle: "MMA", commenceTime: { gt: new Date() } },
     include: {
       bookmakers: {
         include: {

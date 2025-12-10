@@ -291,6 +291,10 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 sm:divide-x divide-gray-200 pt-1">
                   {/* Away side block */}
                   <div className="pb-4 sm:pb-0 sm:pr-4 border-b sm:border-b-0 border-gray-200 sm:border-0">
+                    {/* Mobile-only team label so stacked rows are clear */}
+                    <p className="sm:hidden text-xs font-neue font-semibold text-gray-500 mb-1 uppercase tracking-wider">
+                      {event.awayTeam}
+                    </p>
                     {/* Column headers with bottom border & vertical dividers */}
                     <div className="flex text-xs sm:text-sm font-bold font-neue text-[#111827] uppercase tracking-wider border-b border-gray-100 pb-2 mb-2">
                       <span className="flex-1 text-left">Spread</span>
@@ -329,6 +333,10 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
 
                   {/* Home side block */}
                   <div className="pt-4 sm:pt-0 sm:pl-4">
+                    {/* Mobile-only team label so stacked rows are clear */}
+                    <p className="sm:hidden text-xs font-neue font-semibold text-gray-500 mb-1 uppercase tracking-wider">
+                      {event.homeTeam}
+                    </p>
                     {/* Column headers with bottom border & vertical dividers */}
                     <div className="flex text-xs sm:text-sm font-neue font-bold text-[#111827] uppercase tracking-wider border-b border-gray-100 pb-2 mb-2">
                       <span className="flex-1 text-left">Spread</span>

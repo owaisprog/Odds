@@ -37,7 +37,7 @@ export default async function NBALeaguePage() {
 
   const t0 = Date.now();
   const dbEvents = await prisma.oddsEvent.findMany({
-    where: { sportTitle: "NBA" },
+    where: { sportTitle: "NBA", commenceTime: { gt: new Date() } },
     include: {
       bookmakers: {
         include: {

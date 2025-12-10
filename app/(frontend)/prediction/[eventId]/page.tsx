@@ -1,4 +1,4 @@
-// EventPredictionPage.tsx
+//app/(frontend)/prediction/[eventId]/page.tsx
 import Article from "@/components/prediction/Article";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";

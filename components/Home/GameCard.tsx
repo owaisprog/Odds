@@ -1,3 +1,4 @@
+// components/Home/GameCard.tsx
 "use client";
 
 import { useState } from "react";
