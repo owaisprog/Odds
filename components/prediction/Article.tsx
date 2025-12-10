@@ -427,7 +427,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                   </p>
                 </div>
 
-                {/* Away side heading */}
+                {/* Away side heading-ok */}
                 <div className="flex items-center mt-4">
                   {event.sportTitle !== "MMA" && awayLogoVisible && (
                     <div className="mr-2">
