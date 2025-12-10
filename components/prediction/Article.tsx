@@ -335,7 +335,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                     </div>
                   </div>
 
-                  {/* Home side block */}
+                  {/* Home side block ok*/}
                   <div className="pt-4 sm:pt-0 sm:pl-4">
                     {/* Mobile-only team label so stacked rows are clear */}
                     <p className="sm:hidden text-xs font-neue font-semibold text-gray-500 mb-1 uppercase tracking-wider">

@@ -171,7 +171,7 @@ const EventPredictionPage = async ({
       });
     }
 
-    // 5) Render page, passing both the event and the same-league CMS articles
+    // 5) Render page, hmmm passing both the event and the same-league CMS articles
     return (
       <main className="w-full bg-[#FAFAFA] min-h-screen">
         <section className="w-full py-8 sm:py-12">
