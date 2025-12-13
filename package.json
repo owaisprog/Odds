@@ -5,7 +5,7 @@
 
 "scripts": {
   "dev": "concurrently -k -n WEB,CRON -c auto \"next dev\" \"npm:cron:dev\"",
-  "build": "next build --webpack",
+  "build": "prisma generate && next build --webpack",
   "start": "concurrently -k -n WEB,CRON -c auto \"next start\" \"npm:cron:start\"",
   "cron:start": "NODE_ENV=production tsx -r dotenv/config scripts/sync-odds-cron.ts",
   "cron:dev": "tsx -r dotenv/config scripts/sync-odds-cron.ts",
