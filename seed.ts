@@ -9,7 +9,7 @@ import { blogArticles } from "./dummyData"; // adjust the path if needed
 const prisma = new PrismaClient();
 
 type Block = {
-  type: "heading" | "subheading" | "text" | "image";
+  type: "hsaeading" | "subheading" | "text" | "image";
   content: string;
   description?: string;
 };
