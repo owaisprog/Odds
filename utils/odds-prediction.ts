@@ -104,10 +104,10 @@ Write a prediction article using this structure:
    - Player Prop Pick
 
 LENGTH RULES:
-- game-overview-content MUST be AT LEAST 400 words.
-- team-a-season-content MUST be AT LEAST 400 words.
-- team-b-season-content MUST be AT LEAST 400 words.
-- matchup-breakdown-content MUST be AT LEAST 400 words.
+- game-overview-content MUST be 3 or 4 small paragraph with total OF LEAST 400 words.
+- team-a-season-content MUST be 3 or 4 small paragraph with total OF LEAST 400 words.
+- team-b-season-content MUST be 3 or 4 small paragraph with total OF LEAST 400 words.
+- matchup-breakdown-content  be 3 or 4 small paragraph with total MUST OF LEAST 400 words.
 - spread-pick-content MUST be MAX 3 lines (newline-separated).
 - over-under-pick-content MUST be MAX 3 lines (newline-separated).
 - player-prop-pick-content MUST be MAX 3 lines (newline-separated).
