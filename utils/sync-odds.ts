@@ -24,7 +24,7 @@ const heroImages: any = {
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927298/ameer-basheer-Yzef5dRpwWg-unsplash_bxqjzu.webp",
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927298/dave-adamson--nATH0CrkMU-unsplash_s9w3cd.webp",
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927300/deon-a-webster-pXz8Vh3gFpw-unsplash_uznl54.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927986/ryan-reinoso-Gf0oz8mgd1Y-unsplash_sdsefl.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1765788563/shield-logo-field-day_stfxjf.webp",
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927987/patrick-ogilvie-GB9XKDZWwp0-unsplash_nmkkyw.webp",
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927984/joshua-hoehne-rWxxEgUIfIw-unsplash_fnqqow.webp",
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927986/gene-gallin-WY4Siei3lHo-unsplash_kqtjwz.webp",
@@ -90,6 +90,44 @@ const heroImages: any = {
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764046942/csse08tm1ykclqh0oduc_vamwki.webp",
   ],
 };
+
+type Author = {
+  authorName: string;
+  authorImage: string;
+};
+
+const authors: Author[] = [
+  {
+    authorName: "DeWitt Burnham",
+    authorImage:
+      "https://res.cloudinary.com/dmlemjrcg/image/upload/v1765785790/photo-1761957361067-6ca9101c82e4_qyhfhc.avif",
+  },
+  {
+    authorName: "Rocco W. Harris",
+    authorImage:
+      "https://res.cloudinary.com/dmlemjrcg/image/upload/v1765785844/vitaly-gariev-0CGUB3Gtzxk-unsplash_gpoiw1.jpg",
+  },
+  {
+    authorName: "Steven Barnes",
+    authorImage:
+      "https://res.cloudinary.com/dmlemjrcg/image/upload/v1765786136/linkedin-sales-solutions-pAtA8xe_iVM-unsplash_ige7gz.jpg",
+  },
+  {
+    authorName: "Robbie Barker",
+    authorImage:
+      "https://res.cloudinary.com/dmlemjrcg/image/upload/v1765785949/m_pxio-gCC6T5pmo1A-unsplash_olv54f.jpg",
+  },
+  {
+    authorName: "Timothy M. Johnson",
+    authorImage:
+      "https://res.cloudinary.com/dmlemjrcg/image/upload/v1765785997/vitaly-gariev-GubVKw7cfuY-unsplash_mux5m8.jpg",
+  },
+  {
+    authorName: "Rocco W. Harris",
+    authorImage:
+      "https://res.cloudinary.com/dmlemjrcg/image/upload/v1765786070/david-mumma-aChQUTPMhkI-unsplash_j4r0cr.jpg",
+  },
+];
 
 const API_KEY = process.env.ODDS_API_KEY;
 const BASE_URL = "https://api.the-odds-api.com/v4/sports";
@@ -204,6 +242,23 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+function firstNonEmptyLine(input: string): string {
+  return (
+    input
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean)[0] ?? ""
+  );
+}
+
+function clampMaxLines(input: string, maxLines: number): string {
+  const lines = input
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+  return lines.slice(0, maxLines).join("\n");
+}
+
 // -----------------------------
 // Prediction generation
 // -----------------------------
@@ -244,7 +299,7 @@ async function generateAndStorePredictionForEvent(
   // Prepare the odds data for the prediction
   const oddsData = encode(event);
 
-  // Request OpenAI for prediction content (enhanced prompt + 400-word sections)
+  // Request OpenAI for prediction content (enhanced prompt + 400-word sections where required)
   let completion;
   try {
     completion = await openaiClient.chat.completions.create({
@@ -270,9 +325,17 @@ Write a prediction article using this structure:
    - Over/Under Pick
    - Player Prop Pick
 
-IMPORTANT LENGTH RULE:
-Every content section (every field ending with "-content") MUST be AT LEAST 400 words.
-No summaries. No short answers. Provide deep, detailed, analytical breakdowns.
+LENGTH RULES:
+- game-overview-content MUST be AT LEAST 400 words.
+- team-a-season-content MUST be AT LEAST 400 words.
+- team-b-season-content MUST be AT LEAST 400 words.
+- matchup-breakdown-content MUST be AT LEAST 400 words.
+- spread-pick-content MUST be MAX 3 lines (newline-separated).
+- over-under-pick-content MUST be MAX 3 lines (newline-separated).
+- player-prop-pick-content MUST be MAX 3 lines (newline-separated).
+- spread-pick-final-pick MUST be EXACTLY 1 line (just the pick, no label).
+- over-under-final-pick MUST be EXACTLY 1 line (just the pick, no label).
+- player-prop-final-pick MUST be EXACTLY 1 line (just the pick, no label).
 
 OUTPUT FORMAT (NO MARKDOWN, FOLLOW EXACTLY):
 
@@ -291,13 +354,16 @@ matchup-breakdown-heading: <heading>
 matchup-breakdown-content: <content>
 
 spread-pick-heading: <heading>
-spread-pick-content: <content>
+spread-pick-final-pick: <one line pick>
+spread-pick-content: <max 3 lines>
 
 over-under-pick-heading: <heading>
-over-under-pick-content: <content>
+over-under-final-pick: <one line pick>
+over-under-pick-content: <max 3 lines>
 
 player-prop-pick-heading: <heading>
-player-prop-pick-content: <content>
+player-prop-final-pick: <one line pick>
+player-prop-pick-content: <max 3 lines>
 
 DATA:
 ${oddsData}
@@ -333,7 +399,7 @@ ${oddsData}
       return content.slice(begin).trim();
     }
 
-    const end = content.indexOf(nextLabel);
+    const end = content.indexOf(nextLabel, begin);
     if (end === -1) {
       return content.slice(begin).trim();
     }
@@ -382,27 +448,54 @@ ${oddsData}
 
   const spreadPickHeading = extract(
     "spread-pick-heading:",
+    "spread-pick-final-pick:"
+  );
+  const spreadFinalPickRaw = extract(
+    "spread-pick-final-pick:",
     "spread-pick-content:"
   );
-  const spreadPickDescription = extract(
+  const spreadPickDescriptionRaw = extract(
     "spread-pick-content:",
     "over-under-pick-heading:"
   );
 
   const overUnderPickHeading = extract(
     "over-under-pick-heading:",
+    "over-under-final-pick:"
+  );
+  const overUnderFinalPickRaw = extract(
+    "over-under-final-pick:",
     "over-under-pick-content:"
   );
-  const overUnderPickDescription = extract(
+  const overUnderPickDescriptionRaw = extract(
     "over-under-pick-content:",
     "player-prop-pick-heading:"
   );
 
   const playerPropPickHeading = extract(
     "player-prop-pick-heading:",
+    "player-prop-final-pick:"
+  );
+  const playerPropFinalPickRaw = extract(
+    "player-prop-final-pick:",
     "player-prop-pick-content:"
   );
-  const playerPropPickDescription = extract("player-prop-pick-content:");
+  const playerPropPickDescriptionRaw = extract("player-prop-pick-content:");
+
+  // Enforce storage rules (final picks = 1 line, descriptions = max 3 lines)
+  const spreadFinalPick = firstNonEmptyLine(spreadFinalPickRaw);
+  const overUnderFinalPick = firstNonEmptyLine(overUnderFinalPickRaw);
+  const playerPropFinalPick = firstNonEmptyLine(playerPropFinalPickRaw);
+
+  const spreadPickDescription = clampMaxLines(spreadPickDescriptionRaw, 3);
+  const overUnderPickDescription = clampMaxLines(
+    overUnderPickDescriptionRaw,
+    3
+  );
+  const playerPropPickDescription = clampMaxLines(
+    playerPropPickDescriptionRaw,
+    3
+  );
 
   // Store prediction in the database using the new schema
   try {
@@ -419,10 +512,13 @@ ${oddsData}
         matchupBreakdownDescription,
         spreadPickHeading,
         spreadPickDescription,
+        spreadFinalPick,
         overUnderPickHeading,
         overUnderPickDescription,
+        overUnderFinalPick,
         playerPropPickHeading,
         playerPropPickDescription,
+        playerPropFinalPick,
         oddsEventId,
       },
     });
@@ -458,11 +554,20 @@ async function upsertEventWithChildren(e: ApiEvent) {
   });
 
   const isNewEvent = !existing;
-  const randomNumber = Math.floor(Math.random() * 10) + 1;
+  const sportKey = e.sport_title.toLowerCase() as LeagueKey;
 
-  const sportKey = e.sport_title.toLowerCase();
+  // Get the image pool for this league, or an empty array if missing
+  const leagueImages: string[] = heroImages[sportKey] ?? [];
 
-  const imagehero = heroImages[sportKey][randomNumber];
+  // Choose a valid index in [0, leagueImages.length - 1]
+  let imagehero = "";
+  if (leagueImages.length > 0) {
+    const randomIndex = Math.floor(Math.random() * leagueImages.length);
+    imagehero = leagueImages[randomIndex];
+  }
+
+  const randoAuthor = Math.floor(Math.random() * authors.length);
+  const author = authors[randoAuthor] ?? authors[0];
   const eventRow = await prisma.oddsEvent.upsert({
     where: { id: e.id },
     create: {
@@ -473,6 +578,8 @@ async function upsertEventWithChildren(e: ApiEvent) {
       homeTeam: e.home_team,
       awayTeam: e.away_team,
       image: imagehero,
+      authorName: author.authorName,
+      authorImage: author.authorImage,
     },
     update: {
       sportKey: e.sport_key,

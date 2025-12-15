@@ -6,9 +6,9 @@ import { handleOddsPrediction } from "@/utils/odds-prediction";
 
 async function main() {
   console.log("[CRON] Starting sync-odds cron worker...");
-
+  // "0 * * * *",
   const oddsTask = cron.schedule(
-    "0 * * * *",
+    "0 * * * *", // Runs at Minute 17, Hour 14 (2 PM)
     async () => {
       try {
         console.log("[CRON] Hourly job triggered at", new Date().toISOString());

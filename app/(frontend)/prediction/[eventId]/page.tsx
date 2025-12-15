@@ -1,4 +1,3 @@
-// app/(frontend)/prediction/[eventId]/page.tsx
 import Article from "@/components/prediction/Article";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -41,12 +40,15 @@ export type DetailPrediction = {
 
   spreadPickHeading: string;
   spreadPickDescription: string;
+  spreadFinalPick: string; // Added
 
   overUnderPickHeading: string;
   overUnderPickDescription: string;
+  overUnderFinalPick: string; // Added
 
   playerPropPickHeading: string;
   playerPropPickDescription: string;
+  playerPropFinalPick: string; // Added
 
   oddsEventId: string;
 };
@@ -59,6 +61,8 @@ export type DetailEvent = {
   image: string;
   homeTeam: string;
   awayTeam: string;
+  authorName: string;
+  authorImage: string;
   bookmakers: DetailBookmaker[];
   eventpredictions: DetailPrediction[];
 };
@@ -102,6 +106,8 @@ const EventPredictionPage = async ({
         image: true,
         homeTeam: true,
         awayTeam: true,
+        authorName: true,
+        authorImage: true,
         bookmakers: {
           take: 1,
           select: {
@@ -145,12 +151,15 @@ const EventPredictionPage = async ({
 
             spreadPickHeading: true,
             spreadPickDescription: true,
+            spreadFinalPick: true, // Fetching from DB
 
             overUnderPickHeading: true,
             overUnderPickDescription: true,
+            overUnderFinalPick: true, // Fetching from DB
 
             playerPropPickHeading: true,
             playerPropPickDescription: true,
+            playerPropFinalPick: true, // Fetching from DB
 
             oddsEventId: true,
           },

@@ -150,7 +150,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
     "—";
 
   return (
-    <article className="bg-[#FAFAFA] font-inter text-[#111827]">
+    <article className="bg-[#FAFAFA] font-neue text-[#111827]">
       {/* Breadcrumb */}
       <nav className="mb-4">
         <ol className="flex items-center gap-2 text-sm text-[#111827]">
@@ -225,16 +225,16 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                 <div className="min-w-[600px]">
                   {/* Table Header */}
                   <div className="grid grid-cols-[2fr_1fr_1fr_1fr] bg-gray-50 border-b border-gray-200 px-4 py-2">
-                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider font-inter">
+                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider font-neue">
                       Matchup
                     </div>
-                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider font-inter text-center">
+                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider font-neue text-center">
                       Spread
                     </div>
-                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider font-inter text-center">
+                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider font-neue text-center">
                       Total
                     </div>
-                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider font-inter text-center">
+                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider font-neue text-center">
                       Moneyline
                     </div>
                   </div>
@@ -323,7 +323,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
 
               {/* Source Footer */}
               <div className="bg-gray-50 px-4 py-2 text-center border-t border-gray-200">
-                <p className="text-[10px] text-gray-500 uppercase tracking-wide font-inter">
+                <p className="text-[10px] text-gray-500 uppercase tracking-wide font-neue">
                   Odds via{" "}
                   <span className="font-bold text-[#24257C]">
                     {odds.bookmakerName}
@@ -333,7 +333,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
             </div>
           ) : (
             <div className="bg-white border border-gray-200 rounded-lg p-8 text-center mb-8">
-              <p className="text-gray-500 font-inter">
+              <p className="text-gray-500 font-neue">
                 Odds are currently unavailable for this matchup.
               </p>
             </div>
@@ -356,7 +356,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                     <h3 className="font-gtsuper text-xl sm:text-2xl font-bold text-[#111827] pb-2">
                       {prediction.gameOverviewHeading}
                     </h3>
-                    <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed mb-4">
+                    <div className="prose prose-lg max-w-none font-neue text-lg text-[#111827] leading-relaxed mb-4">
                       <p className="whitespace-pre-line">
                         {prediction.gameOverviewDescription}
                       </p>
@@ -385,7 +385,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                         {prediction.teamASeasonHeading}
                       </h3>
                     </div>
-                    <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed mb-4">
+                    <div className="prose prose-lg max-w-none font-neue text-lg text-[#111827] leading-relaxed mb-4">
                       <p className="whitespace-pre-line">
                         {prediction.teamASeasonDescription}
                       </p>
@@ -414,7 +414,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                         {prediction.teamBSeasonHeading}
                       </h3>
                     </div>
-                    <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed mb-4">
+                    <div className="prose prose-lg max-w-none font-neue text-lg text-[#111827] leading-relaxed mb-4">
                       <p className="whitespace-pre-line">
                         {prediction.teamBSeasonDescription}
                       </p>
@@ -429,7 +429,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                     <h3 className="font-gtsuper text-2xl sm:text-3xl font-bold text-[#111827] mt-4 mb-2 pb-2">
                       {prediction.matchupBreakdownHeading}
                     </h3>
-                    <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed mb-4">
+                    <div className="prose prose-lg max-w-none font-neue text-lg text-[#111827] leading-relaxed mb-4">
                       <p className="whitespace-pre-line">
                         {prediction.matchupBreakdownDescription}
                       </p>
@@ -444,10 +444,17 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                     <h3 className="font-gtsuper text-2xl sm:text-3xl font-bold text-[#111827] mt-4 mb-2 pb-2">
                       {prediction.spreadPickHeading}
                     </h3>
-                    <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed mb-4">
+                    <div className="prose prose-lg max-w-none font-neue text-lg text-[#111827] leading-relaxed mb-4">
                       <p className="whitespace-pre-line">
                         {prediction.spreadPickDescription}
                       </p>
+                      {/* Spread Final Pick */}
+                      {prediction.spreadFinalPick && (
+                        <div className="mt-3 font-neue text-[#111827]">
+                          <span className="font-bold">Spread: </span>
+                          {prediction.spreadFinalPick}
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
@@ -459,10 +466,17 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                     <h3 className="font-gtsuper text-2xl sm:text-3xl font-bold text-[#111827] mt-4 mb-2 pb-2">
                       {prediction.overUnderPickHeading}
                     </h3>
-                    <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed mb-4">
+                    <div className="prose prose-lg max-w-none font-neue text-lg text-[#111827] leading-relaxed mb-4">
                       <p className="whitespace-pre-line">
                         {prediction.overUnderPickDescription}
                       </p>
+                      {/* Over/Under Final Pick */}
+                      {prediction.overUnderFinalPick && (
+                        <div className="mt-3 font-neue text-[#111827]">
+                          <span className="font-bold">Over/Under: </span>
+                          {prediction.overUnderFinalPick}
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
@@ -474,16 +488,47 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                     <h3 className="font-gtsuper text-2xl sm:text-3xl font-bold text-[#111827] mt-4 mb-2 pb-2">
                       {prediction.playerPropPickHeading}
                     </h3>
-                    <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed">
+                    <div className="prose prose-lg max-w-none font-neue text-lg text-[#111827] leading-relaxed">
                       <p className="whitespace-pre-line">
                         {prediction.playerPropPickDescription}
                       </p>
+                      {/* Player Prop Final Pick */}
+                      {prediction.playerPropFinalPick && (
+                        <div className="mt-3 font-neue text-[#111827]">
+                          <span className="font-bold">Player Prop: </span>
+                          {prediction.playerPropFinalPick}
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
               </div>
             ))}
           </section>
+
+          {/* Author Bio Section */}
+          {(event.authorName || event.authorImage) && (
+            <div className="border-t border-gray-200 pt-8 mt-12 flex items-center gap-4">
+              {event.authorImage && (
+                <div className="relative w-14 h-14 rounded-full overflow-hidden bg-gray-100 shrink-0">
+                  <Image
+                    src={event.authorImage}
+                    alt={event.authorName || "Author"}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              <div>
+                <p className="text-xs text-gray-500 font-bold font-neue uppercase tracking-wider mb-1">
+                  Written By
+                </p>
+                <p className="font-gtsuper text-xl font-bold text-[#111827]">
+                  {event.authorName}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right Column - Sidebar */}
@@ -542,7 +587,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                 ))
               ) : (
                 <div className="p-4">
-                  <p className="text-sm text-gray-500 font-inter">
+                  <p className="text-sm text-gray-500 font-neue">
                     No related articles available.
                   </p>
                 </div>

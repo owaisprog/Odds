@@ -261,7 +261,7 @@ export default function ArticlePage() {
           />
         </Head>
         <div
-          className="min-h-screen flex items-center justify-center"
+          className="min-h-screen flex items-center justify-center font-neue"
           style={{ color: "#C83495" }}
         >
           {error}
@@ -284,7 +284,7 @@ export default function ArticlePage() {
             content="width=device-width, initial-scale=1.0"
           />
         </Head>
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center font-neue">
           Article not found
         </div>
       </>
@@ -327,24 +327,24 @@ export default function ArticlePage() {
                 {/* Article Preview */}
                 <div className="text-white max-w-3xl ">
                   <span
-                    className="inline-block px-3 py-1 rounded-md text-sm mb-4"
+                    className="font-neue inline-block px-3 py-1 rounded-md text-sm mb-4"
                     style={{ backgroundColor: "#25818F" }}
                   >
                     {/* ⬇️ CHANGED: show league instead of categories */}
                     {article.league || "General"}
                   </span>
 
-                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3">
+                  <h1 className="font-gtsuper text-3xl md:text-4xl lg:text-5xl font-bold mb-3">
                     {article.title}
                   </h1>
 
-                  <p className="text-sm md:text-base mb-6 text-gray-100">
+                  <p className="font-neue text-sm md:text-base mb-6 text-gray-100">
                     {article.description.length > 150
                       ? `${article.description.substring(0, 150)}...`
                       : article.description}
                   </p>
                   <div className="flex justify-between items-center">
-                    <p className="text-gray-100 text-sm">
+                    <p className="font-neue text-gray-100 text-sm">
                       {format(new Date(article.publishedAt), "MMMM d, yyyy")}
                     </p>
                   </div>
@@ -365,7 +365,7 @@ export default function ArticlePage() {
             <div key={block.id} className="mb-8">
               {block.type === "heading" && (
                 <h2
-                  className="text-2xl md:text-3xl font-bold mb-4"
+                  className="font-gtsuper text-2xl md:text-3xl font-bold mb-4"
                   style={{ color: "#111827" }}
                 >
                   {block.content}
@@ -373,7 +373,7 @@ export default function ArticlePage() {
               )}
               {block.type === "subheading" && (
                 <h3
-                  className="text-xl md:text-2xl font-semibold mb-3"
+                  className="font-gtsuper text-xl md:text-2xl font-semibold mb-3"
                   style={{ color: "#111827" }}
                 >
                   {block.content}
@@ -381,7 +381,7 @@ export default function ArticlePage() {
               )}
               {block.type === "text" && (
                 <p
-                  className="text-base md:text-lg leading-relaxed mb-4"
+                  className="font-neue text-base md:text-lg leading-relaxed mb-4"
                   style={{ color: "#111827" }}
                 >
                   {block.content}
@@ -395,7 +395,7 @@ export default function ArticlePage() {
                     className="w-full h-auto rounded-lg shadow-md object-cover"
                   />
                   {block.description && (
-                    <p className="text-gray-500 text-sm mt-2 italic text-center">
+                    <p className="font-neue text-gray-500 text-sm mt-2 italic text-center">
                       {block.description}
                     </p>
                   )}
@@ -411,7 +411,7 @@ export default function ArticlePage() {
                 {article.metaTags.map((tag: string, index: number) => (
                   <span
                     key={index}
-                    className="inline-block px-4 py-1.5 rounded-full text-sm"
+                    className="font-neue inline-block px-4 py-1.5 rounded-full text-sm"
                     style={{ backgroundColor: "#25818F", color: "white" }}
                   >
                     {tag}
@@ -429,7 +429,7 @@ export default function ArticlePage() {
               )}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center text-white px-4 py-2 rounded-md text-sm transition-colors"
+              className="font-neue inline-flex items-center text-white px-4 py-2 rounded-md text-sm transition-colors"
               style={{ backgroundColor: "#24257C" }}
               onMouseEnter={(e) =>
                 (e.currentTarget.style.backgroundColor = "#C83495")
@@ -453,7 +453,7 @@ export default function ArticlePage() {
               )}&text=${encodeURIComponent(shareTitle)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center text-white px-4 py-2 rounded-md text-sm transition-colors"
+              className="font-neue inline-flex items-center text-white px-4 py-2 rounded-md text-sm transition-colors"
               style={{ backgroundColor: "#24257C" }}
               onMouseEnter={(e) =>
                 (e.currentTarget.style.backgroundColor = "#C83495")

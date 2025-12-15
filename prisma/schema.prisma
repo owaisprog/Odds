@@ -105,6 +105,8 @@ model OddsEvent {
   image            String            @default("")
   bookmakers       OddsBookmaker[]
   eventpredictions Eventprediction[]
+  authorName       String            @default("")
+  authorImage      String            @default("")
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @default(now()) @updatedAt
 
@@ -172,12 +174,15 @@ model Eventprediction {
 
   spreadPickHeading     String @default("")
   spreadPickDescription String @default("")
+  spreadFinalPick       String @default("")
 
   overUnderPickHeading     String @default("")
   overUnderPickDescription String @default("")
+  overUnderFinalPick       String @default("")
 
   playerPropPickHeading     String @default("")
   playerPropPickDescription String @default("")
+  playerPropFinalPick       String @default("")
 
   event       OddsEvent @relation(fields: [oddsEventId], references: [id])
   oddsEventId String

@@ -19,6 +19,26 @@ interface OddsArticleResponse {
 }
 
 // -----------------------------
+// Helpers
+// -----------------------------
+function firstNonEmptyLine(input: string): string {
+  return (
+    input
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean)[0] ?? ""
+  );
+}
+
+function clampMaxLines(input: string, maxLines: number): string {
+  const lines = input
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+  return lines.slice(0, maxLines).join("\n");
+}
+
+// -----------------------------
 // Route
 // -----------------------------
 const todayDaysFromNow = new Date();
@@ -83,6 +103,18 @@ Write a prediction article using this structure:
    - Over/Under Pick
    - Player Prop Pick
 
+LENGTH RULES:
+- game-overview-content MUST be AT LEAST 400 words.
+- team-a-season-content MUST be AT LEAST 400 words.
+- team-b-season-content MUST be AT LEAST 400 words.
+- matchup-breakdown-content MUST be AT LEAST 400 words.
+- spread-pick-content MUST be MAX 3 lines (newline-separated).
+- over-under-pick-content MUST be MAX 3 lines (newline-separated).
+- player-prop-pick-content MUST be MAX 3 lines (newline-separated).
+- spread-pick-final-pick MUST be EXACTLY 1 line (just the pick, no label).
+- over-under-final-pick MUST be EXACTLY 1 line (just the pick, no label).
+- player-prop-final-pick MUST be EXACTLY 1 line (just the pick, no label).
+
 OUTPUT FORMAT (NO MARKDOWN, FOLLOW EXACTLY):
 
 article-title: <title>
@@ -100,13 +132,16 @@ matchup-breakdown-heading: <heading>
 matchup-breakdown-content: <content>
 
 spread-pick-heading: <heading>
-spread-pick-content: <content>
+spread-pick-final-pick: <one line pick>
+spread-pick-content: <max 3 lines>
 
 over-under-pick-heading: <heading>
-over-under-pick-content: <content>
+over-under-final-pick: <one line pick>
+over-under-pick-content: <max 3 lines>
 
 player-prop-pick-heading: <heading>
-player-prop-pick-content: <content>
+player-prop-final-pick: <one line pick>
+player-prop-pick-content: <max 3 lines>
 
 DATA:
 ${oddsData}
@@ -126,11 +161,86 @@ ${oddsData}
 
         if (!nextLabel) return content.slice(begin).trim();
 
-        const end = content.indexOf(nextLabel);
+        const end = content.indexOf(nextLabel, begin);
+        if (end === -1) return content.slice(begin).trim();
+
         return content.slice(begin, end).trim();
       };
 
+      // Robust fallback extractors (in case older format is returned)
+      const extractSpreadFinalFallback = () => {
+        const v = extract(
+          "spread-pick-final-pick:",
+          "spread-pick-content:"
+        ).trim();
+        if (v) return v;
+        // fallback: first line of spread-pick-content
+        return firstNonEmptyLine(
+          extract("spread-pick-content:", "over-under-pick-heading:")
+        );
+      };
+
+      const extractOverUnderFinalFallback = () => {
+        const v = extract(
+          "over-under-final-pick:",
+          "over-under-pick-content:"
+        ).trim();
+        if (v) return v;
+        return firstNonEmptyLine(
+          extract("over-under-pick-content:", "player-prop-pick-heading:")
+        );
+      };
+
+      const extractPlayerPropFinalFallback = () => {
+        const v = extract(
+          "player-prop-final-pick:",
+          "player-prop-pick-content:"
+        ).trim();
+        if (v) return v;
+        return firstNonEmptyLine(extract("player-prop-pick-content:"));
+      };
+
       // Parse output
+      const spreadPickHeading = (() => {
+        const h = extract("spread-pick-heading:", "spread-pick-final-pick:");
+        if (h) return h;
+        // fallback to older format (no final-pick label)
+        return extract("spread-pick-heading:", "spread-pick-content:");
+      })();
+
+      const overUnderPickHeading = (() => {
+        const h = extract("over-under-pick-heading:", "over-under-final-pick:");
+        if (h) return h;
+        return extract("over-under-pick-heading:", "over-under-pick-content:");
+      })();
+
+      const playerPropPickHeading = (() => {
+        const h = extract(
+          "player-prop-pick-heading:",
+          "player-prop-final-pick:"
+        );
+        if (h) return h;
+        return extract(
+          "player-prop-pick-heading:",
+          "player-prop-pick-content:"
+        );
+      })();
+
+      const spreadPickDescriptionRaw = (() => {
+        const v = extract("spread-pick-content:", "over-under-pick-heading:");
+        return v;
+      })();
+
+      const overUnderPickDescriptionRaw = (() => {
+        const v = extract(
+          "over-under-pick-content:",
+          "player-prop-pick-heading:"
+        );
+        return v;
+      })();
+
+      const playerPropPickDescriptionRaw = extract("player-prop-pick-content:");
+
       const article = {
         articleTitle: extract("article-title:", "game-overview-heading:"),
 
@@ -170,29 +280,22 @@ ${oddsData}
           "spread-pick-heading:"
         ),
 
-        spreadPickHeading: extract(
-          "spread-pick-heading:",
-          "spread-pick-content:"
-        ),
-        spreadPickDescription: extract(
-          "spread-pick-content:",
-          "over-under-pick-heading:"
-        ),
+        spreadPickHeading,
+        spreadFinalPick: firstNonEmptyLine(extractSpreadFinalFallback()),
+        spreadPickDescription: clampMaxLines(spreadPickDescriptionRaw, 3),
 
-        overUnderPickHeading: extract(
-          "over-under-pick-heading:",
-          "over-under-pick-content:"
-        ),
-        overUnderPickDescription: extract(
-          "over-under-pick-content:",
-          "player-prop-pick-heading:"
-        ),
+        overUnderPickHeading,
+        overUnderFinalPick: firstNonEmptyLine(extractOverUnderFinalFallback()),
+        overUnderPickDescription: clampMaxLines(overUnderPickDescriptionRaw, 3),
 
-        playerPropPickHeading: extract(
-          "player-prop-pick-heading:",
-          "player-prop-pick-content:"
+        playerPropPickHeading,
+        playerPropFinalPick: firstNonEmptyLine(
+          extractPlayerPropFinalFallback()
         ),
-        playerPropPickDescription: extract("player-prop-pick-content:"),
+        playerPropPickDescription: clampMaxLines(
+          playerPropPickDescriptionRaw,
+          3
+        ),
       };
 
       // Create or Update
