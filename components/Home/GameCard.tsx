@@ -30,14 +30,12 @@ type GameCardGame = {
 };
 
 function getTeamName(team: string, league: string): string {
-  const leaguesWithCityNames = ["NFL", "NBA", "NCAAF", "NCAAB", "MLB"];
-  if (leaguesWithCityNames.includes(league)) {
-    const parts = team.split(" ");
-    if (parts.length > 1) {
-      return parts.slice(1).join(" ");
-    }
-  }
-  return team;
+  // Split the team name by spaces
+  const parts = team.trim().split(" ");
+
+  // Return the last element of the array (the last word)
+  // If the array is empty (unlikely given types), return the original team string
+  return parts.length > 0 ? parts[parts.length - 1] : team;
 }
 
 /** ---------- Helpers ---------- */
