@@ -272,6 +272,7 @@ export default function AdminOddsEventsPage() {
                 {/* Body */}
                 <div className="p-5 flex flex-col gap-3 flex-1">
                   <div>
+                    {ev.image}
                     <p className="font-poppins text-xs text-gray-500">
                       {kickOff}
                     </p>

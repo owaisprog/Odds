@@ -5,7 +5,8 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="mt-20 bg-[#111827] text-white">
+    // Added font-neue here so it cascades to all non-title text
+    <footer className="mt-20 bg-[#111827] text-white font-neue">
       {/* Brand accent line */}
       <div className="h-1 w-full bg-gradient-to-r from-[#24257C] via-[#C83495] to-[#24257C]" />
 
@@ -14,7 +15,7 @@ export default function Footer() {
         <div className="md:flex justify-between px-5 gap-12">
           {/* Brand Section */}
           <div className="lg:col-span-5 flex flex-col gap-6 max-w-lg">
-            <div className="flex  items-center gap-3">
+            <div className="flex items-center gap-3">
               <Image
                 src="/WebLogo.png"
                 alt="DGenSports"
@@ -24,7 +25,7 @@ export default function Footer() {
                 className="block h-auto w-auto -mt-15"
               />
             </div>
-            <p className="text-white/70 leading-relaxed text-base">
+            <p className="text-white/70 leading-relaxed text-base -mt-10">
               Real data. Real analysis. Updated daily. DGenSports delivers
               concise breakdowns and odds you can scan fast—no fluff, just
               signal.
@@ -53,7 +54,8 @@ export default function Footer() {
 
           {/* Leagues (combined column) */}
           <div className="lg:col-span-3 flex flex-col gap-6 mt-10 md:mt-0 min-w-[180px]">
-            <h3 className="text-lg font-bold text-white uppercase tracking-wider">
+            {/* Added font-gtsuper for the heading */}
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider font-gtsuper">
               Leagues
             </h3>
             <ul className="space-y-4">
