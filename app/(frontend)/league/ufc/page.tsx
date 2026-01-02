@@ -2,7 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import LeagueEventsUFC from "@/components/league/UfcEvents";
 
-/** What we send to the client (serialize Dates -> strings) */
+export const dynamic = "force-dynamic";
 export type SerializableOutcome = {
   id: string;
   name: string;
@@ -35,7 +35,7 @@ export type SerializableOddsEvent = {
 export default async function UFCLeaguePage() {
   // Pull ONLY UFC events from DB
   const dbEvents = await prisma.oddsEvent.findMany({
-    where: { sportTitle: "MMA" },
+    where: { sportTitle: "MMA", commenceTime: { gt: new Date() } },
     include: {
       bookmakers: {
         include: {

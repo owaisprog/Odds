@@ -2,7 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import LeagueEventsNBA from "@/components/league/NbaEvents";
 
-/** What we send to the client (serialize Dates -> strings) */
+export const dynamic = "force-dynamic";
 export type SerializableOutcome = {
   id: string;
   name: string;
